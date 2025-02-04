@@ -4,6 +4,16 @@ go 1.23.2
 
 require github.com/gin-gonic/gin v1.10.0
 
+require github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
+
+require github.com/google/go-cmp v0.5.9 // indirect
+
+require github.com/kr/pretty v0.3.1 // indirect
+
+require github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
+
+require gopkg.in/check.v1 v1.0.0-20201130134442-10cb98267c6c // indirect
+
 require (
 	github.com/bytedance/sonic v1.11.6 // indirect
 	github.com/bytedance/sonic/loader v0.1.1 // indirect
@@ -30,5 +40,6 @@ require (
 	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 	google.golang.org/protobuf v1.34.1 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )

@@ -1,9 +1,14 @@
 package main
 
 import (
-	"fmt"
+	"nyauth_backed/source"
+	"nyauth_backed/source/logger"
+	"nyauth_backed/source/server"
 )
 
 func main() {
-	fmt.Printf("Hello, Nyauth!")
+	logger.InitLogger(logger.DEBUG)
+	logger.Info("Hello, Nyauth!")
+	source.LoadConfig()
+	server.Setupserver()
 }
