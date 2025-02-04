@@ -15,7 +15,7 @@ import (
 func Setupserver() {
 	gin.SetMode(gin.ReleaseMode)
 
-	r := setuprouter()
+	r := Init()
 
 	// start http server
 	address := fmt.Sprintf("%s:%d", source.AppConfig.Server.Host, source.AppConfig.Server.Port)
