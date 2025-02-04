@@ -7,8 +7,9 @@ defineOptions({
 <template>
     <v-app>
         <v-main>
-            <router-view />
-            <v-btn prepend-icon="$vuetify" append-icon="$vuetify"> Button </v-btn>
+            <v-container>
+                <router-view />
+            </v-container>
         </v-main>
     </v-app>
 </template>
