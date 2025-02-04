@@ -4,4 +4,11 @@ defineOptions({
 })
 </script>
 
-<template>114514</template>
+<template>
+    <v-app>
+        <v-main>
+            <router-view />
+            <v-btn prepend-icon="$vuetify" append-icon="$vuetify"> Button </v-btn>
+        </v-main>
+    </v-app>
+</template>
