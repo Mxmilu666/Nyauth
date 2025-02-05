@@ -9,4 +9,3 @@ updates:
       prefix: "chore"
     labels:
       - "dependencies"
-      - "automated"
