@@ -1,73 +1,49 @@
 package database
 
 import (
-	"context"
+	"fmt"
 
+	"nyauth_backed/source"
 	"nyauth_backed/source/logger"
 
-	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
-	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
-// User 表示 user 集合中的文档结构
-type User struct {
-	UserID     bson.ObjectID `bson:"_id"`
-	UserSecret string        `bson:"userSecret"`
-	Name       string        `bson:"name"`
-	Email      string        `bson:"email"`
-	RegisterAt bson.DateTime `bson:"RegisterAt"`
-	IsBanned   bool          `bson:"isBanned"`
-}
-
 var DatabaseName = "nyauth"
-var UserCollection = "user"
+var UserCollection = "users"
 var ClientCollection = "clients"
 
-// SetupDatabase 连接到 MongoDB
-func SetupDatabase(uri string) (*mongo.Client, error) {
-	clientOptions := options.Client().ApplyURI(uri)
+// 保存数据库连接
+var client *mongo.Client
 
-	client, err := mongo.Connect(clientOptions)
-	if err != nil {
-		return nil, err
-	}
+// InitDatabase 初始化数据库
+func InitDatabase() error {
+	// 初始化数据库
+	uri := fmt.Sprintf("mongodb://%s:%s@%s:%d",
+		source.AppConfig.Database.Username,
+		source.AppConfig.Database.Password,
+		source.AppConfig.Database.Host,
+		source.AppConfig.Database.Port,
+	)
 
-	// 检查连接
-	err = client.Ping(context.TODO(), nil)
-	if err != nil {
-		return nil, err
-	}
+	logger.Info("Try to use %v to connect to the MongoDB on %v:%v", source.AppConfig.Database.Username, source.AppConfig.Database.Host, source.AppConfig.Database.Port)
 
-	logger.Info("Connected to MongoDB")
-	return client, nil
-}
-
-// EnsureCollection 确保指定的集合存在
-func EnsureCollection(client *mongo.Client, dbName, collectionName string) error {
-	collectionNames, err := client.Database(dbName).ListCollectionNames(context.TODO(), bson.M{})
+	var err error
+	client, err = SetupDatabase(uri)
 	if err != nil {
 		return err
 	}
 
-	// 检查集合是否存在
-	collectionExists := false
-	for _, name := range collectionNames {
-		if name == collectionName {
-			collectionExists = true
-			break
-		}
+	// 初始化用户集合
+	err = EnsureCollection(client, DatabaseName, UserCollection)
+	if err != nil {
+		return err
 	}
 
-	// 如果集合不存在，则创建集合
-	if !collectionExists {
-		err := client.Database(dbName).CreateCollection(context.TODO(), collectionName)
-		if err != nil {
-			return err
-		}
-		logger.Debug("Collection %s created successfully", collectionName)
-	} else {
-		logger.Debug("Collection %s already exists. Skip", collectionName)
+	// 初始化 Client 集合
+	err = EnsureCollection(client, DatabaseName, ClientCollection)
+	if err != nil {
+		return err
 	}
 
 	return nil

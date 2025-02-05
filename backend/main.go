@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"nyauth_backed/source"
+	"nyauth_backed/source/database"
 	"nyauth_backed/source/logger"
 	"nyauth_backed/source/server"
 )
@@ -9,6 +11,13 @@ import (
 func main() {
 	logger.InitLogger(logger.DEBUG)
 	logger.Info("Hello, Nyauth!")
-	source.LoadConfig()
+	err := source.LoadConfig()
+	if err != nil {
+		logger.Fatal("Failed to load config: ", err)
+	}
+	err = database.InitDatabase()
+	if err != nil {
+		logger.Fatal(fmt.Sprintf("Failed to initialize database: %s\n", err.Error()))
+	}
 	server.Setupserver()
 }
