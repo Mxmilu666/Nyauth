@@ -4,4 +4,9 @@ updates:
     directory: "/backend"
     schedule:
       interval: "daily"
-    target-branch: "main"
+      timezone: "Asia/Shanghai"
+    commit-message:
+      prefix: "chore"
+    labels:
+      - "dependencies"
+      - "automated"
