@@ -11,12 +11,12 @@ import (
 
 // user 集合中的文档结构
 type User struct {
-	UserID     bson.ObjectID `bson:"_id"`
-	UserSecret string        `bson:"userSecret"`
-	Name       string        `bson:"name"`
-	Email      string        `bson:"email"`
-	RegisterAt bson.DateTime `bson:"RegisterAt"`
-	IsBanned   bool          `bson:"isBanned"`
+	UserID       bson.ObjectID `bson:"_id"`
+	UserPassword string        `bson:"user_pass"`
+	Name         string        `bson:"name"`
+	Email        string        `bson:"email"`
+	RegisterAt   bson.DateTime `bson:"register_at"`
+	IsBanned     bool          `bson:"is_banned"`
 }
 
 // SetupDatabase 连接到 MongoDB
@@ -68,6 +68,26 @@ func EnsureCollection(client *mongo.Client, dbName, collectionName string) error
 	return nil
 }
 
-func CheckUserExists(username string) bool {
-	return true
+// CheckUserExists 检查用户是否存在
+func CheckUserExists(username string) (bool, error) {
+	collection := client.Database(DatabaseName).Collection(UserCollection)
+
+	filter := bson.M{
+		"$or": []bson.M{
+			{"name": username},
+			{"email": username},
+		},
+	}
+
+	// 查找一个匹配的文档
+	var result bson.M
+	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return false, nil
+		}
+		return false, err
+	}
+
+	return true, nil
 }

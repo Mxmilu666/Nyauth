@@ -1,9 +1,10 @@
 package handles
 
 import (
-	"encoding/json"
 	"net/http"
 	"nyauth_backed/source/database"
+
+	"github.com/gin-gonic/gin"
 )
 
 type Credentials struct {
@@ -12,18 +13,22 @@ type Credentials struct {
 	Secretkey string `json:"turnstile_secretkey"`
 }
 
-func Userlogin(w http.ResponseWriter, r *http.Request) {
+func Userlogin(c *gin.Context) {
 	var creds Credentials
-	err := json.NewDecoder(r.Body).Decode(&creds)
-	if err != nil {
-		http.Error(w, "Invalid request payload", http.StatusBadRequest)
+	if err := c.ShouldBindJSON(&creds); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
 		return
 	}
 
-	// 看看用户在不在
-	userExists := database.CheckUserExists(creds.Username)
-	if !userExists {
-		http.Error(w, "User does not exist", http.StatusUnauthorized)
+	userExists, err := database.CheckUserExists(creds.Username)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error checking user existence"})
 		return
 	}
+	if !userExists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "User does not exist"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "User exists"})
 }

@@ -2,6 +2,7 @@ package server
 
 import (
 	"net/http"
+	"nyauth_backed/source/server/handles"
 
 	"github.com/gin-gonic/gin"
 )
@@ -22,9 +23,7 @@ func Init() *gin.Engine {
 
 		account := api.Group("/account")
 		{
-			account.POST("/login", func(c *gin.Context) {
-				c.String(http.StatusOK, "Hello, World!")
-			})
+			account.POST("/login", handles.Userlogin)
 		}
 	}
 	return r
