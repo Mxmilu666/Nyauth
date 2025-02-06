@@ -1,6 +1,8 @@
 import { createApp, type Component, type App } from 'vue'
 import { sleep } from '@/utils/common'
 
+import { vuetify } from '@/main'
+
 export function useMountComponent(data: Record<string, any> = {}) {
     let isOpen = false
     const mount = <T>(component: Component) => {
@@ -22,6 +24,7 @@ export function useMountComponent(data: Record<string, any> = {}) {
                     resolve(data)
                 }
             })
+            app.use(vuetify)
             app.mount(div)
         })
     }
@@ -44,6 +47,7 @@ export function useMountComponent(data: Record<string, any> = {}) {
                 div.remove()
             }
         })
+        app.use(vuetify)
         const mountedComponent = app.mount(div)
         return {
             component: mountedComponent as any,
