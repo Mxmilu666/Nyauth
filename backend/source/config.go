@@ -24,10 +24,16 @@ type DatabaseConfig struct {
 	Password string `yaml:"password"`
 }
 
+type turnstileConfig struct {
+	SiteKey   string `yaml:"sitekey"`
+	SecretKey string `yaml:"secretkey"`
+}
+
 // Config 结构体定义配置项
 type Config struct {
-	Server   ServerConfig   `yaml:"server"`
-	Database DatabaseConfig `yaml:"database"`
+	Server    ServerConfig    `yaml:"server"`
+	Database  DatabaseConfig  `yaml:"database"`
+	Turnstile turnstileConfig `yaml:"turnstile"`
 }
 
 // 全局变量保存配置
@@ -45,6 +51,10 @@ func defaultConfig() *Config {
 			Port:     27017,
 			Username: "root",
 			Password: "123456",
+		},
+		Turnstile: turnstileConfig{
+			SiteKey:   "sitekey",
+			SecretKey: "secretkey",
 		},
 	}
 }

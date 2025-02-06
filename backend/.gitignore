@@ -23,6 +23,7 @@ go.work.sum
 
 # env file
 .env
-
+# key file
+data
 # config file
 config.yaml

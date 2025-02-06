@@ -19,6 +19,13 @@ func Init() *gin.Engine {
 		api.GET("/code", func(c *gin.Context) {
 			c.String(http.StatusOK, "Hello, World!")
 		})
+
+		account := api.Group("/account")
+		{
+			account.POST("/login", func(c *gin.Context) {
+				c.String(http.StatusOK, "Hello, World!")
+			})
+		}
 	}
 	return r
 }
