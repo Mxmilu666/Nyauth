@@ -75,11 +75,10 @@ func GetUserByUsername(username string) (bool, *User, error) {
 
 	filter := bson.M{
 		"$or": []bson.M{
-			{"name": username},
-			{"email": username},
+			{"user_name": username},
+			{"user_email": username},
 		},
 	}
-
 	// 查找一个匹配的文档
 	var user User
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)

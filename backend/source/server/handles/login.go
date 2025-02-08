@@ -48,15 +48,21 @@ func Userlogin(c *gin.Context) {
 		return
 	}
 
+	exp := int64(60 * 60 * 24)
+
 	token, err := helper.JwtHelper.IssueToken(map[string]interface{}{
 		"username": user.Username,
 		"role":     user.Role,
-	}, "user", 60*60*24)
+	}, "user", exp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("issue token err: %s", err.Error())})
 		return
 	}
 
-	c.SetCookie("token", token, 60*60, "/api", "", false, true)
-
+	c.JSON(http.StatusOK, gin.H{
+		"status": "success",
+		"token":  token,
+		"exp":    exp,
+	})
+	return
 }
