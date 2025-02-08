@@ -12,13 +12,13 @@ func Init() *gin.Engine {
 	r.Use(filterLogs())
 
 	r.GET("/", func(c *gin.Context) {
-		c.String(http.StatusOK, "Hello, World!")
+		handles.SendResponse(c, http.StatusOK, "对不起，线路依然繁忙，请再等一下，或者稍后再打过来", nil)
 	})
 
 	api := r.Group("/api/v0")
 	{
 		api.GET("/code", func(c *gin.Context) {
-			c.String(http.StatusOK, "Hello, World!")
+			handles.SendResponse(c, http.StatusOK, "对不起，线路依然繁忙，请再等一下，或者稍后再打过来", nil)
 		})
 
 		account := api.Group("/account")

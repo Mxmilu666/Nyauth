@@ -18,33 +18,17 @@ type Credentials struct {
 func Userlogin(c *gin.Context) {
 	var creds Credentials
 	if err := c.ShouldBindJSON(&creds); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status": "error",
-			"error":  "Invalid request payload",
-		})
+		SendResponse(c, http.StatusBadRequest, "请求负载无效", nil)
 		return
 	}
 
 	userExists, user, err := database.GetUserByUsername(creds.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "error",
-			"message": "Error checking user existence",
-		})
+		SendResponse(c, http.StatusInternalServerError, "检查用户存在时出错，数据库爆炸啦！", nil)
 		return
 	}
-	if !userExists {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "User does not exist or the password is incorrect",
-		})
-		return
-	}
-	if user.UserPassword != creds.Password {
-		c.JSON(http.StatusNotFound, gin.H{
-			"status":  "error",
-			"message": "User does not exist or the password is incorrect",
-		})
+	if !userExists || user.UserPassword != creds.Password {
+		SendResponse(c, http.StatusNotFound, "用户不存在或密码不正确", nil)
 		return
 	}
 
@@ -55,14 +39,12 @@ func Userlogin(c *gin.Context) {
 		"role":     user.Role,
 	}, "user", exp)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("issue token err: %s", err.Error())})
+		SendResponse(c, http.StatusInternalServerError, fmt.Sprintf("issue token err: %s", err.Error()), nil)
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status": "success",
-		"token":  token,
-		"exp":    exp,
+	SendResponse(c, http.StatusOK, "获取 Token 成功", gin.H{
+		"token": token,
+		"exp":   exp,
 	})
-	return
 }
