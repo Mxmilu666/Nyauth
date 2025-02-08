@@ -13,28 +13,28 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-type JwtHelper struct {
+type JwtHelperCert struct {
 	privateKey *rsa.PrivateKey
 	publicKey  *rsa.PublicKey
 }
 
-var instance *JwtHelper
+var JwtHelper *JwtHelperCert
 
 const (
 	privateKeyPath = "./data/private.key"
 	publicKeyPath  = "./data/public.key"
 )
 
-func GetInstance() (*JwtHelper, error) {
-	if instance == nil {
-		helper := &JwtHelper{}
+func GetInstance() (*JwtHelperCert, error) {
+	if JwtHelper == nil {
+		helper := &JwtHelperCert{}
 		err := helper.loadKeys()
 		if err != nil {
 			return nil, err
 		}
-		instance = helper
+		JwtHelper = helper
 	}
-	return instance, nil
+	return JwtHelper, nil
 }
 
 func ensureDataDir() error {
@@ -48,7 +48,7 @@ func ensureDataDir() error {
 }
 
 // 加载或生成密钥对
-func (j *JwtHelper) loadKeys() error {
+func (j *JwtHelperCert) loadKeys() error {
 	if fileExists(privateKeyPath) && fileExists(publicKeyPath) {
 		// 如果密钥文件存在
 		privKeyData, err := ioutil.ReadFile(privateKeyPath)
@@ -96,7 +96,7 @@ func (j *JwtHelper) loadKeys() error {
 }
 
 // 签发 JWT
-func (j *JwtHelper) IssueToken(payload map[string]interface{}, audience string, expiresInSeconds int64) (string, error) {
+func (j *JwtHelperCert) IssueToken(payload map[string]interface{}, audience string, expiresInSeconds int64) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"aud":  audience,
 		"iss":  "Nyauth-Server",
@@ -107,7 +107,7 @@ func (j *JwtHelper) IssueToken(payload map[string]interface{}, audience string, 
 }
 
 // 验证 JWT
-func (j *JwtHelper) VerifyToken(tokenString string, audience string) (*jwt.Token, error) {
+func (j *JwtHelperCert) VerifyToken(tokenString string, audience string) (*jwt.Token, error) {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, errors.New("unexpected signing method")

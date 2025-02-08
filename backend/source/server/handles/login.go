@@ -1,8 +1,10 @@
 package handles
 
 import (
+	"fmt"
 	"net/http"
 	"nyauth_backed/source/database"
+	"nyauth_backed/source/helper"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,19 +18,45 @@ type Credentials struct {
 func Userlogin(c *gin.Context) {
 	var creds Credentials
 	if err := c.ShouldBindJSON(&creds); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request payload"})
+		c.JSON(http.StatusBadRequest, gin.H{
+			"status": "error",
+			"error":  "Invalid request payload",
+		})
 		return
 	}
 
-	userExists, err := database.CheckUserExists(creds.Username)
+	userExists, user, err := database.GetUserByUsername(creds.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Error checking user existence"})
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "error",
+			"message": "Error checking user existence",
+		})
 		return
 	}
 	if !userExists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "User does not exist"})
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  "error",
+			"message": "User does not exist or the password is incorrect",
+		})
+		return
+	}
+	if user.UserPassword != creds.Password {
+		c.JSON(http.StatusNotFound, gin.H{
+			"status":  "error",
+			"message": "User does not exist or the password is incorrect",
+		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "User exists"})
+	token, err := helper.JwtHelper.IssueToken(map[string]interface{}{
+		"username": user.Username,
+		"role":     user.Role,
+	}, "user", 60*60*24)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": fmt.Sprintf("issue token err: %s", err.Error())})
+		return
+	}
+
+	c.SetCookie("token", token, 60*60, "/api", "", false, true)
+
 }

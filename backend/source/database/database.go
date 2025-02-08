@@ -13,10 +13,11 @@ import (
 type User struct {
 	UserID       bson.ObjectID `bson:"_id"`
 	UserPassword string        `bson:"user_pass"`
-	Name         string        `bson:"name"`
-	Email        string        `bson:"email"`
+	Username     string        `bson:"user_name"`
+	UserEmail    string        `bson:"user_email"`
 	RegisterAt   bson.DateTime `bson:"register_at"`
 	IsBanned     bool          `bson:"is_banned"`
+	Role         string        `bson:"role"`
 }
 
 // SetupDatabase 连接到 MongoDB
@@ -68,8 +69,8 @@ func EnsureCollection(client *mongo.Client, dbName, collectionName string) error
 	return nil
 }
 
-// CheckUserExists 检查用户是否存在
-func CheckUserExists(username string) (bool, error) {
+// GetUserByUsername 通过用户名获取用户信息
+func GetUserByUsername(username string) (bool, *User, error) {
 	collection := client.Database(DatabaseName).Collection(UserCollection)
 
 	filter := bson.M{
@@ -80,14 +81,14 @@ func CheckUserExists(username string) (bool, error) {
 	}
 
 	// 查找一个匹配的文档
-	var result bson.M
-	err := collection.FindOne(context.TODO(), filter).Decode(&result)
+	var user User
+	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			return false, nil
+			return false, nil, nil
 		}
-		return false, err
+		return false, nil, err
 	}
 
-	return true, nil
+	return true, &user, nil
 }
