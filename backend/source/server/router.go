@@ -23,7 +23,9 @@ func Init() *gin.Engine {
 
 		account := api.Group("/account")
 		{
-			account.POST("/login", handles.Userlogin)
+			account.POST("/login", handles.UserLogin)
+			account.POST("/register", handles.UserRegister)
+			account.POST("/sendcode", handles.SendVerificationCode)
 		}
 	}
 	return r

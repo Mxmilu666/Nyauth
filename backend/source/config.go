@@ -29,11 +29,19 @@ type turnstileConfig struct {
 	SecretKey string `yaml:"secretkey"`
 }
 
+type smtpConfig struct {
+	Host     string `yaml:"host"`
+	Port     int    `yaml:"port"`
+	Username string `yaml:"username"`
+	Password string `yaml:"password"`
+}
+
 // Config 结构体定义配置项
 type Config struct {
 	Server    ServerConfig    `yaml:"server"`
 	Database  DatabaseConfig  `yaml:"database"`
 	Turnstile turnstileConfig `yaml:"turnstile"`
+	SMTP      smtpConfig      `yaml:"smtp"`
 }
 
 // 全局变量保存配置
@@ -55,6 +63,12 @@ func defaultConfig() *Config {
 		Turnstile: turnstileConfig{
 			SiteKey:   "sitekey",
 			SecretKey: "secretkey",
+		},
+		SMTP: smtpConfig{
+			Host:     "smtp.example.com",
+			Port:     587,
+			Username: "",
+			Password: "your-email-password",
 		},
 	}
 }

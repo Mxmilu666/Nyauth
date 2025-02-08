@@ -3,22 +3,12 @@ package database
 import (
 	"context"
 	"nyauth_backed/source/logger"
+	"nyauth_backed/source/models"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
-
-// user 集合中的文档结构
-type User struct {
-	UserID       bson.ObjectID `bson:"_id"`
-	UserPassword string        `bson:"user_pass"`
-	Username     string        `bson:"user_name"`
-	UserEmail    string        `bson:"user_email"`
-	RegisterAt   bson.DateTime `bson:"register_at"`
-	IsBanned     bool          `bson:"is_banned"`
-	Role         string        `bson:"role"`
-}
 
 // SetupDatabase 连接到 MongoDB
 func SetupDatabase(uri string) (*mongo.Client, error) {
@@ -70,7 +60,7 @@ func EnsureCollection(client *mongo.Client, dbName, collectionName string) error
 }
 
 // GetUserByUsername 通过用户名获取用户信息
-func GetUserByUsername(username string) (bool, *User, error) {
+func GetUserByUsername(username string) (bool, *models.DatabaseUser, error) {
 	collection := client.Database(DatabaseName).Collection(UserCollection)
 
 	filter := bson.M{
@@ -80,7 +70,7 @@ func GetUserByUsername(username string) (bool, *User, error) {
 		},
 	}
 	// 查找一个匹配的文档
-	var user User
+	var user models.DatabaseUser
 	err := collection.FindOne(context.TODO(), filter).Decode(&user)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
