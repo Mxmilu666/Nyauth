@@ -7,10 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func Init() *gin.Engine {
-	r := gin.New()
-	r.Use(filterLogs())
-
+func initRouter(r *gin.Engine) *gin.Engine {
 	r.GET("/", func(c *gin.Context) {
 		c.Redirect(http.StatusFound, "https://ys.mihoyo.com")
 	})

@@ -15,7 +15,10 @@ import (
 func Setupserver() {
 	gin.SetMode(gin.ReleaseMode)
 
-	r := Init()
+	r := gin.New()
+	r.Use(filterLogs())
+	r.Use(corsMiddleware())
+	r = initRouter(r)
 
 	// start http server
 	address := fmt.Sprintf("%s:%d", source.AppConfig.Server.Host, source.AppConfig.Server.Port)
@@ -56,5 +59,17 @@ func filterLogs() gin.HandlerFunc {
 			userAgent,  // 用户代理
 			fullURL,    // 完整的 URL 包括路径和查询参数
 		))
+	}
+}
+
+func corsMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		c.Writer.Header().Set("Access-Control-Allow-Origin", "*")
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
 	}
 }
