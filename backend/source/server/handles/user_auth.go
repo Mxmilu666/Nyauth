@@ -58,7 +58,7 @@ func SendVerificationCode(c *gin.Context) {
 		return
 	}
 
-	err := helper.SendVerificationCodeByEmail(creds.Useremail)
+	err := helper.SendVerificationCodeByEmail(creds.Useremail, "register")
 	if err != nil {
 		logger.Error("Failed to send verification code: ", err)
 		SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)

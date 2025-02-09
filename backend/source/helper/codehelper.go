@@ -15,6 +15,7 @@ import (
 type VerificationCode struct {
 	Code      string
 	ExpiresAt time.Time
+	UseFor    string
 }
 
 // 内存缓存，用于存储验证码
@@ -58,7 +59,7 @@ func SendEmail(to, subject, body string) error {
 }
 
 // SendVerificationCodeByEmail 发送验证码到用户的电子邮件
-func SendVerificationCodeByEmail(to string) error {
+func SendVerificationCodeByEmail(to, usefor string) error {
 	// 生成验证码
 	code := generateVerificationCode()
 
@@ -71,6 +72,7 @@ func SendVerificationCodeByEmail(to string) error {
 	codeCache.m[to] = VerificationCode{
 		Code:      code,
 		ExpiresAt: expiration,
+		UseFor:    usefor,
 	}
 	codeCache.Unlock()
 
@@ -85,7 +87,7 @@ func SendVerificationCodeByEmail(to string) error {
 }
 
 // VerifyCode 验证用户输入的验证码是否正确
-func VerifyCode(email, code string) bool {
+func VerifyCode(email, code, usefor string) bool {
 	codeCache.RLock()
 	storedCode, exists := codeCache.m[email]
 	codeCache.RUnlock()
@@ -99,5 +101,18 @@ func VerifyCode(email, code string) bool {
 		return false
 	}
 
-	return storedCode.Code == code
+	// 检查验证码用途是否正确
+	if usefor != storedCode.UseFor {
+		return false
+	}
+
+	// 验证码正确，删除缓存中的验证码
+	if storedCode.Code == code {
+		codeCache.Lock()
+		delete(codeCache.m, email)
+		codeCache.Unlock()
+		return true
+	}
+
+	return false
 }
