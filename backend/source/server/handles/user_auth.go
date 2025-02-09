@@ -65,5 +65,5 @@ func SendVerificationCode(c *gin.Context) {
 		return
 	}
 
-	SendResponse(c, http.StatusOK, "发送验证码成功!", nil)
+	SendResponse(c, http.StatusOK, "发送验证码成功! 请注意查收~", nil)
 }
