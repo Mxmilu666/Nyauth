@@ -86,12 +86,32 @@ func SendVerificationCode(c *gin.Context) {
 		return
 	}
 
-	err := helper.SendVerificationCodeByEmail(creds.Useremail, "register")
-	if err != nil {
-		logger.Error("Failed to send verification code: ", err)
-		SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
+	// 从查询参数中读取 usefor
+	usefor := c.Query("usefor")
+	if usefor == "" {
+		SendResponse(c, http.StatusBadRequest, "请求无效", nil)
 		return
 	}
 
-	SendResponse(c, http.StatusOK, "发送验证码成功! 请注意查收~", nil)
+	// 根据 usefor 执行对应的操作
+	switch usefor {
+	case "register":
+		err := helper.SendVerificationCodeByEmail(creds.Useremail, "register")
+		if err != nil {
+			logger.Error("Failed to send verification code: ", err)
+			SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
+			return
+		}
+		SendResponse(c, http.StatusOK, "发送验证码成功! 请注意查收~", nil)
+	case "reset_password":
+		err := helper.SendVerificationCodeByEmail(creds.Useremail, "reset_password")
+		if err != nil {
+			logger.Error("Failed to send verification code: ", err)
+			SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
+			return
+		}
+		SendResponse(c, http.StatusOK, "发送验证码成功! 请注意查收~", nil)
+	default:
+		SendResponse(c, http.StatusBadRequest, "无效的参数", nil)
+	}
 }
