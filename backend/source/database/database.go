@@ -3,7 +3,6 @@ package database
 import (
 	"context"
 	"nyauth_backed/source/logger"
-	"nyauth_backed/source/models"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -57,27 +56,4 @@ func EnsureCollection(client *mongo.Client, dbName, collectionName string) error
 	}
 
 	return nil
-}
-
-// GetUserByUsername 通过用户名获取用户信息
-func GetUserByUsername(username string) (bool, *models.DatabaseUser, error) {
-	collection := client.Database(DatabaseName).Collection(UserCollection)
-
-	filter := bson.M{
-		"$or": []bson.M{
-			{"user_name": username},
-			{"user_email": username},
-		},
-	}
-	// 查找一个匹配的文档
-	var user models.DatabaseUser
-	err := collection.FindOne(context.TODO(), filter).Decode(&user)
-	if err != nil {
-		if err == mongo.ErrNoDocuments {
-			return false, nil, nil
-		}
-		return false, nil, err
-	}
-
-	return true, &user, nil
 }

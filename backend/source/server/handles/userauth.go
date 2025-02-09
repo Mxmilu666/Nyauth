@@ -48,7 +48,35 @@ func UserLogin(c *gin.Context) {
 
 // 用户注册
 func UserRegister(c *gin.Context) {
+	var creds models.RegisterCredentials
+	if err := c.ShouldBindJSON(&creds); err != nil {
+		SendResponse(c, http.StatusBadRequest, "请求无效", nil)
+		return
+	}
 
+	if !helper.VerifyCode(creds.Useremail, creds.Code, "register") {
+		SendResponse(c, http.StatusBadRequest, "验证码错误", nil)
+		return
+	}
+
+	userExists, _, err := database.GetUserByUsername(creds.Username)
+	if err != nil {
+		SendResponse(c, http.StatusInternalServerError, "检查用户存在时出错，数据库爆炸啦！", nil)
+		return
+	}
+	if userExists {
+		SendResponse(c, http.StatusConflict, "邮箱或用户名已存在", nil)
+		return
+	}
+
+	err = database.CreateUser(creds.Username, creds.Useremail, creds.Password)
+	if err != nil {
+		logger.Error("Failed to create user: ", err)
+		SendResponse(c, http.StatusInternalServerError, "创建用户时出错", nil)
+		return
+	}
+
+	SendResponse(c, http.StatusOK, "用户注册成功", nil)
 }
 
 func SendVerificationCode(c *gin.Context) {
