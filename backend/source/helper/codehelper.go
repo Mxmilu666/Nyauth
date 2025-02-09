@@ -3,12 +3,12 @@ package helper
 import (
 	"fmt"
 	"math/rand"
-	"net/smtp"
-	"strconv"
 	"sync"
 	"time"
 
 	"nyauth_backed/source"
+
+	"gopkg.in/gomail.v2"
 )
 
 // 验证码结构体，包含验证码和过期时间
@@ -38,23 +38,23 @@ func generateVerificationCode() string {
 }
 
 func SendEmail(to, subject, body string) error {
-	from := source.AppConfig.SMTP.Username
+	// 从配置中读取 SMTP 相关信息
+	username := source.AppConfig.SMTP.Username
+	from := source.AppConfig.SMTP.From
 	password := source.AppConfig.SMTP.Password
-
-	// 设置SMTP服务器信息
 	smtpHost := source.AppConfig.SMTP.Host
 	smtpPort := source.AppConfig.SMTP.Port
 
-	// 设置邮件内容
-	msg := "From: " + from + "\n" +
-		"To: " + to + "\n" +
-		"Subject: " + subject + "\n\n" +
-		body
+	// 创建一封邮件
+	m := gomail.NewMessage()
+	m.SetHeader("From", from)
+	m.SetHeader("To", to)
+	m.SetHeader("Subject", subject)
+	m.SetBody("text/html", body)
 
+	d := gomail.NewDialer(smtpHost, smtpPort, username, password)
 	// 发送邮件
-	auth := smtp.PlainAuth("", from, password, smtpHost)
-	err := smtp.SendMail(smtpHost+":"+strconv.Itoa(smtpPort), auth, from, []string{to}, []byte(msg))
-	return err
+	return d.DialAndSend(m)
 }
 
 // SendVerificationCodeByEmail 发送验证码到用户的电子邮件

@@ -32,6 +32,7 @@ type turnstileConfig struct {
 type smtpConfig struct {
 	Host     string `yaml:"host"`
 	Port     int    `yaml:"port"`
+	From     string `yaml:"from"`
 	Username string `yaml:"username"`
 	Password string `yaml:"password"`
 }
@@ -67,6 +68,7 @@ func defaultConfig() *Config {
 		SMTP: smtpConfig{
 			Host:     "smtp.example.com",
 			Port:     587,
+			From:     "",
 			Username: "",
 			Password: "your-email-password",
 		},

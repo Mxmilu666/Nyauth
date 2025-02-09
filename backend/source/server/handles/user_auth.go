@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"nyauth_backed/source/database"
 	"nyauth_backed/source/helper"
+	"nyauth_backed/source/logger"
 	"nyauth_backed/source/models"
 
 	"github.com/gin-gonic/gin"
@@ -14,7 +15,7 @@ import (
 func UserLogin(c *gin.Context) {
 	var creds models.LoginCredentials
 	if err := c.ShouldBindJSON(&creds); err != nil {
-		SendResponse(c, http.StatusBadRequest, "请求负载无效", nil)
+		SendResponse(c, http.StatusBadRequest, "请求无效", nil)
 		return
 	}
 
@@ -53,15 +54,16 @@ func UserRegister(c *gin.Context) {
 func SendVerificationCode(c *gin.Context) {
 	var creds models.EmailCredentials
 	if err := c.ShouldBindJSON(&creds); err != nil {
-		SendResponse(c, http.StatusBadRequest, "Invalid request payload", nil)
+		SendResponse(c, http.StatusBadRequest, "请求无效", nil)
 		return
 	}
 
 	err := helper.SendVerificationCodeByEmail(creds.Useremail)
 	if err != nil {
-		SendResponse(c, http.StatusInternalServerError, "Failed to send verification code", nil)
+		logger.Error("Failed to send verification code: ", err)
+		SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
 		return
 	}
 
-	SendResponse(c, http.StatusOK, "Verification code sent successfully", nil)
+	SendResponse(c, http.StatusOK, "发送验证码成功!", nil)
 }
