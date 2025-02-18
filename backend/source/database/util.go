@@ -100,3 +100,26 @@ func CreateUser(username, email, password string) error {
 
 	return nil
 }
+
+// GetUserByID 通过用户ID获取用户信息
+func GetUserByID(userID string) (*models.DatabaseUser, error) {
+	collection := client.Database(DatabaseName).Collection(UserCollection)
+
+	// 将字符串类型的 userID 转换为 ObjectID
+	objID, err := bson.ObjectIDFromHex(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	// 查找一个匹配的文档
+	var user models.DatabaseUser
+	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&user)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &user, nil
+}

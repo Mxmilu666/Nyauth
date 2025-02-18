@@ -18,11 +18,16 @@ func initRouter(r *gin.Engine) *gin.Engine {
 			handles.SendResponse(c, http.StatusOK, "对不起，线路依然繁忙，请再等一下，或者稍后再打过来", nil)
 		})
 
-		account := api.Group("/account")
+		auth := api.Group("/account/auth")
 		{
-			account.POST("/login", handles.UserLogin)
-			account.POST("/register", handles.UserRegister)
-			account.POST("/sendcode", handles.SendVerificationCode)
+			auth.POST("/login", handles.UserLogin)
+			auth.POST("/register", handles.UserRegister)
+			auth.POST("/sendcode", handles.SendVerificationCode)
+		}
+
+		account := api.Group("/account", handles.JWTMiddleware("user"))
+		{
+			account.GET("/info", handles.UserInfo)
 		}
 	}
 	return r

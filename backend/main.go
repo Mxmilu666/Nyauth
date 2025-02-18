@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Failed to initialize database: %s\n", err.Error()))
 	}
-	_, err = helper.GetInstance()
+	err = helper.InitJWTHelper()
 	if err != nil {
 		logger.Fatal(fmt.Sprintf("Failed to initialize JWTHelper: %s\n", err.Error()))
 	}

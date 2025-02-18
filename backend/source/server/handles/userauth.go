@@ -32,8 +32,9 @@ func UserLogin(c *gin.Context) {
 	exp := int64(60 * 60 * 24)
 
 	token, err := helper.JwtHelper.IssueToken(map[string]interface{}{
-		"username": user.Username,
-		"role":     user.Role,
+		"user_name": user.Username,
+		"user_id":   user.UserID,
+		"role":      user.Role,
 	}, "user", exp)
 	if err != nil {
 		SendResponse(c, http.StatusInternalServerError, fmt.Sprintf("issue token err: %s", err.Error()), nil)

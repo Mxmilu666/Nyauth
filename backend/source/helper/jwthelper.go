@@ -25,16 +25,14 @@ const (
 	publicKeyPath  = "./data/public.key"
 )
 
-func GetInstance() (*JwtHelperCert, error) {
-	if JwtHelper == nil {
-		helper := &JwtHelperCert{}
-		err := helper.loadKeys()
-		if err != nil {
-			return nil, err
-		}
-		JwtHelper = helper
+func InitJWTHelper() error {
+	helper := &JwtHelperCert{}
+	err := helper.loadKeys()
+	if err != nil {
+		return err
 	}
-	return JwtHelper, nil
+	JwtHelper = helper
+	return nil
 }
 
 func ensureDataDir() error {
