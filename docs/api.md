@@ -5,7 +5,7 @@
 ## 用户登录
 
 ### 请求
-- URL: `/account/login`
+- URL: `/account/auth/login`
 - 方法: `POST`
 - 查询参数：无
 - 请求体:
@@ -101,7 +101,7 @@
 
 ### 请求
 
-- URL: `/account/register`
+- URL: `/account/auth/register`
 
 - 方法: POST
 

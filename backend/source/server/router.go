@@ -22,8 +22,9 @@ func initRouter(r *gin.Engine) *gin.Engine {
 		{
 			auth.POST("/login", handles.UserLogin)
 			auth.POST("/register", handles.UserRegister)
-			auth.POST("/sendcode", handles.SendVerificationCode)
 		}
+
+		api.POST("/account/sendcode", handles.SendVerificationCode)
 
 		account := api.Group("/account", handles.JWTMiddleware("user"))
 		{
