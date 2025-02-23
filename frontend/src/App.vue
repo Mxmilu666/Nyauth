@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { message } from './services/message'
+import AppBar from './components/AppBar.vue'
 
 defineOptions({
     name: 'AppComponent'
@@ -10,10 +11,9 @@ message.info('Hello from App Component')
 
 <template>
     <v-app>
+        <AppBar />
         <v-main>
-            <v-container>
-                <router-view />
-            </v-container>
+            <router-view />
         </v-main>
     </v-app>
 </template>
