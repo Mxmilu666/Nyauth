@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import stepper from '@/components/stepper.vue';
+import nfooter from '@/components/footer.vue';
 defineOptions({
     name: 'HomePage'
 })
@@ -30,7 +32,7 @@ defineOptions({
                             </v-btn>
                         </v-row>
                     </v-col>
-                    <v-col cols="12" md="6" >
+                    <v-col cols="12" md="6">
                         <img src="@/assets/banner.svg" alt="banner" class="svg-image" />
                     </v-col>
                 </v-row>
@@ -93,13 +95,17 @@ defineOptions({
             </v-col>
         </v-row>
 
-        <v-row class="pt-10">
-            <v-col cols="20" class="text-center">
-                <h2 class="font-weight-bold text-h4 mt-10">为什么选择 Nyauth?</h2>
+        <v-row class="pt-15">
+            <v-col cols="12" md=3 justify="center">
+                <h2 class="font-weight-bold text-h4 mt-10">只需四步即可接入 Nyauth</h2>
             </v-col>
-            <v-divider></v-divider>
+            <v-col cols="12" md=9>
+                <stepper></stepper>
+            </v-col>
+            <v-divider class="pt-10"></v-divider>
         </v-row>
     </v-container>
+    <nfooter></nfooter>
 </template>
 
 <style scoped>
