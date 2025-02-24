@@ -18,13 +18,13 @@ defineOptions({
                             只需一个 Nyauth 账户即可访问所有已接入 Nyauth 的服务
                         </p>
                         <v-row class="pt-10">
-                            <v-btn color="pink-lighten-1" class="ma-2" @click="$router.push('/login')">
+                            <v-btn color="primary" class="ma-2" @click="$router.push('/login')">
                                 <template v-slot:prepend>
                                     <v-icon icon="mdi-check"></v-icon>
                                 </template>
                                 开始使用
                             </v-btn>
-                            <v-btn color="blue" class="ma-2" @click="$router.push('/docs')">
+                            <v-btn color="secondary" class="ma-2" @click="$router.push('/docs')">
                                 <template v-slot:prepend>
                                     <v-icon icon="mdi-file-document-outline"></v-icon>
                                 </template>

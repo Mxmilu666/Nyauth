@@ -3,7 +3,7 @@ import { ref } from 'vue';
 </script>
 
 <template>
-  <v-footer class="custom-footer" color="pink-lighten-5">
+  <v-footer class="custom-footer" color="appbar">
     <v-row justify="center" no-gutters>
       <v-col cols="12">
         版权所有 © {{ new Date().getFullYear() }} <strong>Nyauth</strong> 保留所有权利
