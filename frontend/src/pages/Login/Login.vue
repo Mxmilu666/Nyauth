@@ -31,11 +31,14 @@ defineOptions({
                     <v-card-actions class="px-8 pb-6 d-flex flex-column align-items-center">
                         <v-btn block append-icon="mdi-chevron-right" color="primary" variant="flat">登录</v-btn>
                         <div class="d-flex justify-space-between w-100 mt-1">
-                            <v-btn color="primary">忘记密码</v-btn>
-                            <v-btn color="primary">注册账号</v-btn>
+                            <v-btn color="primary" variant="text">忘记密码</v-btn>
+                            <v-btn color="primary" variant="text">注册账号</v-btn>
                         </div>
                     </v-card-actions>
                 </v-card>
+                <div class="text-center mt-8">
+                    <v-btn color="primary" prepend-icon="mdi-fingerprint" variant="text">使用外部验证器登录</v-btn>
+                </div>
             </v-col>
         </v-row>
     </v-container>
