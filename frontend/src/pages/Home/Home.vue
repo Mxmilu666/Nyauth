@@ -38,7 +38,7 @@ defineOptions({
                         </v-row>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-lazy class="d-flex justify-end">
+                        <v-lazy class="d-flex justify-center justify-md-end">
                             <img
                                 src="@/assets/banner.png"
                                 alt="banner"
@@ -129,6 +129,8 @@ defineOptions({
 
 <style scoped>
 .home {
+    margin-top: 20px;
+
     .banner-image {
         width: 66%;
         height: auto;
