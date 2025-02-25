@@ -10,13 +10,13 @@ defineOptions({
     <v-app>
         <app-bar />
         <v-main>
-            <RouterView v-slot="{ Component, route }">
+            <router-view v-slot="{ Component, route }">
                 <v-fade-transition>
                     <div :key="route.name">
-                        <component :is="Component"></component>
+                        <component :is="Component" />
                     </div>
                 </v-fade-transition>
-            </RouterView>
+            </router-view>
         </v-main>
     </v-app>
 </template>
