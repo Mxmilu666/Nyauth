@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { message } from './services/message'
 import AppBar from '@/components/AppBar.vue'
 
 defineOptions({
@@ -9,7 +8,7 @@ defineOptions({
 
 <template>
     <v-app>
-        <AppBar />
+        <app-bar />
         <v-main>
             <v-fade-transition>
                 <router-view />

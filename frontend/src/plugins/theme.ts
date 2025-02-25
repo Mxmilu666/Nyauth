@@ -1,6 +1,6 @@
-import { type ThemeDefinition } from 'vuetify';
+import { type ThemeDefinition } from 'vuetify'
 
-const lightTheme: ThemeDefinition = {
+export const lightTheme: ThemeDefinition = {
     dark: false,
     colors: {
         background: '#FAFAFA',
@@ -11,11 +11,11 @@ const lightTheme: ThemeDefinition = {
         info: '#2196F3',
         success: '#4CAF50',
         warning: '#FB8C00',
-        appbar: '#F06292',
-    },
-};
+        appbar: '#F06292'
+    }
+}
 
-const darkTheme: ThemeDefinition = {
+export const darkTheme: ThemeDefinition = {
     dark: true,
     colors: {
         background: '#121212',
@@ -26,8 +26,6 @@ const darkTheme: ThemeDefinition = {
         info: '#2196F3',
         success: '#4CAF50',
         warning: '#FB8C00',
-        appbar: '#212121',
-    },
-};
-
-export { lightTheme, darkTheme };
+        appbar: '#212121'
+    }
+}
