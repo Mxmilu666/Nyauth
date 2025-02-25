@@ -38,7 +38,7 @@ defineOptions({
                         </v-row>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-lazy :min-height="600" class="d-flex justify-end">
+                        <v-lazy class="d-flex justify-end">
                             <img
                                 src="@/assets/banner.png"
                                 alt="banner"
