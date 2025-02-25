@@ -7,15 +7,13 @@ defineOptions({
 </script>
 
 <template>
-    <v-container class="login fill-height d-flex align-center justify-center"fluid>
+    <v-container class="login fill-height d-flex align-center justify-center" fluid>
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
                 <v-card>
                     <v-card-title class="text-center">
                         <div class="py-5">
-                            <v-avatar color="primary">
-                                <v-icon icon="mdi-lock-outline" size="small" />
-                            </v-avatar>
+                            <v-avatar class="logo" color="primary" />
                             <p class="pt-2 text-h5">登录到 <strong>Nyauth</strong></p>
                         </div>
                     </v-card-title>
@@ -67,6 +65,14 @@ defineOptions({
 
 <style scoped>
 .login {
-    min-height: 100vh
+    min-height: 100vh;
+
+    .logo {
+        width: 100px;
+        height: 100px;
+        border-radius: 100%;
+        background: url('@/assets/logo/512x.png') no-repeat center;
+        background-size: cover;
+    }
 }
 </style>

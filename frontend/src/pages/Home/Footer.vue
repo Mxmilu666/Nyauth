@@ -14,6 +14,7 @@ defineOptions({
             <v-col class="mt-2" cols="12"> By Mxmilu & Alongw with ❤ </v-col>
             <v-col class="mt-2" cols="12">
                 <v-btn
+                    color="while"
                     prepend-icon="mdi-github"
                     href="https://github.com/Mxmilu666/Nyauth"
                     variant="outlined"
