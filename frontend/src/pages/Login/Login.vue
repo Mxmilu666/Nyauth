@@ -7,10 +7,7 @@ defineOptions({
 </script>
 
 <template>
-    <v-container
-        class="fill-height d-flex align-center justify-center grey-background"
-        fluid
-    >
+    <v-container class="login fill-height d-flex align-center justify-center"fluid>
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
                 <v-card>
@@ -67,3 +64,9 @@ defineOptions({
         </v-row>
     </v-container>
 </template>
+
+<style scoped>
+.login {
+    min-height: 100vh
+}
+</style>

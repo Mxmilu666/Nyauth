@@ -22,27 +22,29 @@ defineOptions({
                             <v-btn
                                 color="primary"
                                 class="ma-2"
+                                prepend-icon="mdi-check"
                                 @click="$router.push('/login')"
                             >
-                                <template v-slot:prepend>
-                                    <v-icon icon="mdi-check" />
-                                </template>
                                 开始使用
                             </v-btn>
                             <v-btn
                                 color="secondary"
                                 class="ma-2"
+                                prepend-icon="mdi-file-document-outline"
                                 @click="$router.push('/docs')"
                             >
-                                <template v-slot:prepend>
-                                    <v-icon icon="mdi-file-document-outline" />
-                                </template>
                                 使用文档
                             </v-btn>
                         </v-row>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <img src="@/assets/banner.svg" alt="banner" class="svg-image" />
+                        <v-lazy :min-height="600" class="d-flex justify-end">
+                            <img
+                                src="@/assets/banner.png"
+                                alt="banner"
+                                class="banner-image"
+                            />
+                        </v-lazy>
                     </v-col>
                 </v-row>
             </v-col>
@@ -127,10 +129,8 @@ defineOptions({
 
 <style scoped>
 .home {
-    margin-top: 100px;
-
-    .svg-image {
-        width: 100%;
+    .banner-image {
+        width: 66%;
         height: auto;
     }
 
