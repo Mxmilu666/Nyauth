@@ -38,11 +38,7 @@ defineOptions({
                         </v-row>
                     </v-col>
                     <v-col cols="12" md="6">
-                        <v-lazy
-                            class="d-flex justify-center justify-md-end"
-                            :min-height="200"
-                            :options="{ threshold: 0.5 }"
-                        >
+                        <v-lazy class="d-flex justify-center justify-md-end">
                             <img
                                 src="@/assets/banner.png"
                                 alt="banner"

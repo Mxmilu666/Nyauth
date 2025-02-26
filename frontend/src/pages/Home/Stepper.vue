@@ -22,14 +22,14 @@ const steps = [
 ]
 
 const step_n = ref(1)
-
-function next() {
+const next = () => {
     if (step_n.value < steps.length) step_n.value += 1
 }
 
-function prev() {
+const prev = () => {
     if (step_n.value > 1) step_n.value -= 1
 }
+
 </script>
 
 <template>

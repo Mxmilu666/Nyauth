@@ -1,4 +1,5 @@
 import './assets/style/base.less'
+import './assets/style/common.less'
 import 'vuetify/styles'
 import '@mdi/font/css/materialdesignicons.css'
 
