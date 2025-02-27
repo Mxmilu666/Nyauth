@@ -2,6 +2,7 @@
 import { ref } from 'vue'
 import { defineOptions } from 'vue'
 
+
 defineOptions({
     name: 'RegisterPage'
 })
