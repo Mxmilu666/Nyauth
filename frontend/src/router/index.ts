@@ -11,12 +11,7 @@ const router = createRouter({
         {
             name: 'Login',
             path: '/login',
-            component: () => import('@/pages/Userauth/Login.vue')
-        },
-        {
-            name: 'Register',
-            path: '/regsiter',
-            component: () => import('@/pages/Userauth/Register.vue')
+            component: () => import('@/pages/Userauth/Auth.vue')
         },
         {
             name: 'ResetPassword',

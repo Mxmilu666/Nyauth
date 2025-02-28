@@ -49,12 +49,6 @@ defineOptions({
                             <v-btn
                                 color="primary"
                                 variant="text"
-                                @click="$router.push('/register')"
-                                >注册账号</v-btn
-                            >
-                            <v-btn
-                                color="primary"
-                                variant="text"
                                 @click="$router.push('/login')"
                                 >返回登录</v-btn
                             >
