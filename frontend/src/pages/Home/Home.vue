@@ -23,7 +23,7 @@ defineOptions({
                                 color="primary"
                                 class="ma-2"
                                 prepend-icon="mdi-check"
-                                @click="$router.push('/login')"
+                                @click="$router.push({name: 'Login'})"
                             >
                                 开始使用
                             </v-btn>

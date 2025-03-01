@@ -49,7 +49,7 @@ defineOptions({
                             <v-btn
                                 color="primary"
                                 variant="text"
-                                @click="$router.push('/login')"
+                                @click="$router.push({name: 'Login'})"
                                 >返回登录</v-btn
                             >
                         </div>

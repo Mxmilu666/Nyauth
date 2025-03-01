@@ -17,6 +17,19 @@ const router = createRouter({
             name: 'ResetPassword',
             path: '/reset-password',
             component: () => import('@/pages/Userauth/Reset.vue')
+        },
+        {
+            path: '/console',
+            name: 'Console',
+            component: () => import('@/pages/Console/Console.vue'),
+
+            children: [
+                {
+                    path: '',
+                    name: 'ConsoleHome',
+                    component: () => import('@/pages/Console/Home.vue')
+                }
+            ]
         }
     ]
 })

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, type VNodeRef } from 'vue'
+import { ref } from 'vue'
 import { defineOptions } from 'vue'
 import { VForm } from 'vuetify/lib/components/index.mjs'
 
@@ -106,7 +106,7 @@ const login = async () => {
                             <v-btn
                                 color="primary"
                                 variant="text"
-                                @click="$router.push('/reset-password')"
+                                @click="$router.push({name: 'ResetPassword'})"
                                 >忘记密码</v-btn
                             >
                             <div v-if="istologin" class="d-flex align-center">
@@ -114,7 +114,10 @@ const login = async () => {
                                 <div class="text-subtitle-2 text-primary">保持登录</div>
                             </div>
                         </div>
-                        <p v-if="!istologin && !istoregister" class="text-center text-subtitle-2">
+                        <p
+                            v-if="!istologin && !istoregister"
+                            class="text-center text-subtitle-2"
+                        >
                             未注册用户输入邮箱将自动注册
                         </p>
                     </v-card-actions>
