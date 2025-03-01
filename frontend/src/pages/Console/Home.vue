@@ -1,17 +1,28 @@
 <script setup lang="ts">
-import { defineOptions, inject } from 'vue'
+import { defineOptions, inject, computed } from 'vue'
 
 defineOptions({
     name: 'ConsoleHome'
 })
 
 const avatar = inject('avatar') as string
+
+const currentHour = new Date().getHours()
+
+const timeGreeting = computed(() => {
+    if (currentHour < 5) return '时间不早了哦，该休息啦'
+    if (currentHour < 9) return '早哦~ 要不要再继续睡一会zzz'
+    if (currentHour < 12) return '中午好~ 该吃午饭啦'
+    if (currentHour < 18) return '下午好哦，要不要来点下午茶？'
+    return '晚上好~ 吃过晚饭了嘛?'
+})
+
 </script>
 
 <template>
     <v-container class="center">
         <v-avatar :image="avatar" size="110"></v-avatar>
-        <p class="text-h5 pt-4 font-weight-bold">晚上好，Mxmilu</p>
+        <p class="text-h5 pt-4 font-weight-bold">Mxmilu，{{ timeGreeting }}</p>
         <p class="text-subtitle-1 py-2">
             管理自己的信息、隐私和安全，创建应用程序、开发等更多玩法
         </p>
