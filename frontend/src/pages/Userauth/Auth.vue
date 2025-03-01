@@ -5,6 +5,7 @@ import { VForm } from 'vuetify/lib/components/index.mjs'
 
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
+import { sleep } from '@/utils/common'
 
 defineOptions({
     name: 'AuthPage'
@@ -12,6 +13,7 @@ defineOptions({
 
 const istologin = ref(false)
 const istoregister = ref(false)
+const isLoading = ref(false)
 
 const email = ref('')
 const password = ref('')
@@ -27,7 +29,11 @@ const login = async () => {
     if (!form.value) return
     const { valid } = await form.value.validate()
     if (!valid) return
-    istoregister.value = true
+    isLoading.value = true
+    sleep(1000).then(() => {
+        isLoading.value = false
+        istoregister.value = true
+    })
 }
 </script>
 
@@ -38,7 +44,14 @@ const login = async () => {
     >
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
-                <v-card>
+                <v-card :disabled="isLoading" :loading="isLoading">
+                    <template v-slot:loader="{ isActive }">
+                        <v-progress-linear
+                            :active="isActive"
+                            color="primary"
+                            indeterminate
+                        ></v-progress-linear>
+                    </template>
                     <v-card-title class="text-center">
                         <div class="py-5">
                             <v-lazy>
