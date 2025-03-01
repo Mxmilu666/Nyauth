@@ -21,9 +21,7 @@ const props = defineProps({
 
 <template>
     <div>
-        <v-sheet color="surface">
-            <v-otp-input v-model="otp" type="text" />
-        </v-sheet>
+        <v-otp-input v-model="otp" type="text" />
         <p class="text-center">验证码已发送至 {{ email }}</p>
         <p class="text-center">请注意查收并验证</p>
     </div>

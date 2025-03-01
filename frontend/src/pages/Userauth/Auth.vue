@@ -21,8 +21,8 @@ const otp = ref('')
 const form = ref<InstanceType<typeof VForm>>()
 
 const emailRules = [
-    (value: string) => !!value || '电子邮箱是必须的',
-    (value: string) => /.+@.+\..+/.test(value) || '电子邮箱格式非法'
+    (value: string) => !!value,
+    (value: string) => /.+@.+\..+/.test(value) || '请输入有效的电子邮箱'
 ]
 
 const login = async () => {
@@ -109,7 +109,14 @@ const login = async () => {
                                 @click="$router.push('/reset-password')"
                                 >忘记密码</v-btn
                             >
+                            <div v-if="istologin" class="d-flex align-center">
+                                <v-checkbox-btn density="comfortable" color="primary" />
+                                <div class="text-subtitle-2 text-primary">保持登录</div>
+                            </div>
                         </div>
+                        <p v-if="!istologin && !istoregister" class="text-center text-subtitle-2">
+                            未注册用户输入邮箱将自动注册
+                        </p>
                     </v-card-actions>
                 </v-card>
                 <div class="text-center mt-8">
