@@ -36,18 +36,23 @@ provide('avatar', avatar)
                 title="首页"
                 value="home"
                 :to="{ name: 'ConsoleHome' }"
+                exact
             ></v-list-item>
 
             <v-list-item
                 prepend-icon="mdi-card-account-details-outline"
                 title="个人信息"
                 value="info"
+                :to="{ name: 'ConsoleInfo' }"
+                exact
             ></v-list-item>
 
             <v-list-item
                 prepend-icon="mdi-lock-outline"
                 title="数据和隐私设置"
                 value="security"
+                :to="{ name: 'ConsoleSecurity' }"
+                exact
             ></v-list-item>
 
             <v-list-group value="Log">

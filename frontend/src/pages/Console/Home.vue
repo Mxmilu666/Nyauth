@@ -109,8 +109,8 @@ const timeGreeting = computed(() => {
     padding-right: 150px;
 }
 
-::v-deep .v-card,
-::v-deep .v-card > * {
+:deep(.v-card),
+:deep(.v-card > *) {
     text-align: left;
 }
 

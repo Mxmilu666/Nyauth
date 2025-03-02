@@ -18,16 +18,26 @@ const router = createRouter({
             path: '/reset-password',
             component: () => import('@/pages/Userauth/Reset.vue')
         },
+        // console
         {
             path: '/console',
             name: 'Console',
             component: () => import('@/pages/Console/Console.vue'),
-
             children: [
                 {
                     path: '',
                     name: 'ConsoleHome',
                     component: () => import('@/pages/Console/Home.vue')
+                },
+                {
+                    path: 'info',
+                    name: 'ConsoleInfo',
+                    component: () => import('@/pages/Console/Profile/Info.vue')
+                },
+                {
+                    path: 'security',
+                    name: 'ConsoleSecurity',
+                    component: () => import('@/pages/Console/Security/security.vue')
                 }
             ]
         }
