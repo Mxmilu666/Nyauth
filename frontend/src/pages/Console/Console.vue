@@ -28,8 +28,7 @@ provide('avatar', avatar)
             />
         </v-list>
 
-        <v-divider></v-divider>
-        <v-divider></v-divider>
+        <v-divider />
         <v-list density="compact" nav>
             <v-list-item
                 prepend-icon="mdi-account-circle"
@@ -37,7 +36,7 @@ provide('avatar', avatar)
                 value="home"
                 :to="{ name: 'ConsoleHome' }"
                 exact
-            ></v-list-item>
+            />
 
             <v-list-item
                 prepend-icon="mdi-card-account-details-outline"
@@ -45,7 +44,7 @@ provide('avatar', avatar)
                 value="info"
                 :to="{ name: 'ConsoleInfo' }"
                 exact
-            ></v-list-item>
+            />
 
             <v-list-item
                 prepend-icon="mdi-lock-outline"
@@ -53,7 +52,7 @@ provide('avatar', avatar)
                 value="security"
                 :to="{ name: 'ConsoleSecurity' }"
                 exact
-            ></v-list-item>
+            />
 
             <v-list-group value="Log">
                 <template v-slot:activator="{ props }">
@@ -61,10 +60,10 @@ provide('avatar', avatar)
                         v-bind="props"
                         prepend-icon="mdi-file-document-outline"
                         title="操作日志"
-                    ></v-list-item>
+                    />
                 </template>
-                <v-list-item title="登录日志" value="Loginlog"></v-list-item>
-                <v-list-item title="授权日志" value="Authlog"></v-list-item>
+                <v-list-item title="登录日志" value="Loginlog" />
+                <v-list-item title="授权日志" value="Authlog" />
             </v-list-group>
         </v-list>
     </v-navigation-drawer>
