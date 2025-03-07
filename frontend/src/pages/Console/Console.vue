@@ -34,7 +34,7 @@ provide('avatar', avatar)
                 prepend-icon="mdi-account-circle"
                 title="首页"
                 value="home"
-                :to="{ name: 'ConsoleHome' }"
+                :to="{ name: 'HomePage' }"
                 exact
             />
 
@@ -42,7 +42,7 @@ provide('avatar', avatar)
                 prepend-icon="mdi-card-account-details-outline"
                 title="个人信息"
                 value="info"
-                :to="{ name: 'ConsoleInfo' }"
+                :to="{ name: 'InfoPage' }"
                 exact
             />
 
@@ -50,7 +50,7 @@ provide('avatar', avatar)
                 prepend-icon="mdi-lock-outline"
                 title="数据和隐私设置"
                 value="security"
-                :to="{ name: 'ConsoleSecurity' }"
+                :to="{ name: 'SecurityPage' }"
                 exact
             />
 

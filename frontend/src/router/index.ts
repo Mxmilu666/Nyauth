@@ -26,17 +26,17 @@ const router = createRouter({
             children: [
                 {
                     path: '',
-                    name: 'ConsoleHome',
+                    name: 'HomePage',
                     component: () => import('@/pages/Console/Home.vue')
                 },
                 {
                     path: 'info',
-                    name: 'ConsoleInfo',
+                    name: 'InfoPage',
                     component: () => import('@/pages/Console/Profile/Info.vue')
                 },
                 {
                     path: 'security',
-                    name: 'ConsoleSecurity',
+                    name: 'SecurityPage',
                     component: () => import('@/pages/Console/Security/security.vue')
                 }
             ]

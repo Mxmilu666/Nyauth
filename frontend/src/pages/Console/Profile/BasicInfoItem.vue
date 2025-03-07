@@ -1,3 +1,17 @@
+<script setup lang="ts">
+defineOptions({
+    name: 'BasicInfoItem'
+})
+interface Props {
+    label: string
+    content: string
+    avatar?: string
+    onClick?: () => void
+}
+const props = defineProps<Props>()
+const { onClick } = props
+</script>
+
 <template>
     <v-list-item @click="onClick && onClick()">
         <v-list-item-content>
@@ -20,17 +34,3 @@
         </template>
     </v-list-item>
 </template>
-
-<script setup lang="ts">
-defineOptions({
-    name: 'BasicInfoItem'
-})
-interface Props {
-    label: string
-    content: string
-    avatar?: string
-    onClick?: () => void
-}
-const props = defineProps<Props>()
-const { onClick } = props
-</script>

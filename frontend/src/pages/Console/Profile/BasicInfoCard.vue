@@ -1,3 +1,20 @@
+<script setup lang="ts">
+import BasicInfoItem from './BasicInfoItem.vue'
+
+defineOptions({
+    name: 'BasicInfoCard'
+})
+
+interface Props {
+    avatar: string
+    username: string
+    email: string
+    userId: string
+}
+const props = defineProps<Props>()
+</script>
+
+
 <template>
     <v-card class="pa-1">
         <v-card-title>基本信息</v-card-title>
@@ -26,19 +43,3 @@
         </v-list>
     </v-card>
 </template>
-
-<script setup lang="ts">
-import BasicInfoItem from './BasicInfoItem.vue'
-
-defineOptions({
-    name: 'BasicInfoCard'
-})
-
-interface Props {
-    avatar: string
-    username: string
-    email: string
-    userId: string
-}
-const props = defineProps<Props>()
-</script>

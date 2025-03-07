@@ -3,7 +3,7 @@ import { defineOptions, inject } from 'vue'
 import BasicInfoCard from './BasicInfoCard.vue'
 
 defineOptions({
-    name: 'ConsoleInfo'
+    name: 'InfoPage'
 })
 
 const avatar = inject('avatar') as string
