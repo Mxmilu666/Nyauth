@@ -3,7 +3,7 @@ import { defineOptions } from 'vue'
 import { useConsole } from '@/hooks/useConsole'
 
 defineOptions({
-    name: 'ConsoleHome'
+    name: 'HomePage'
 })
 
 const { avatar, timeGreeting } = useConsole()
