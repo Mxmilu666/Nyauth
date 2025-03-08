@@ -32,9 +32,7 @@ const avatar = inject('avatar') as string
             </v-row>
             <div class="ps-1 pb-3 pt-2">
                 <p class="text-h5 pt-4">Nyauth 中的其他信息和偏好设置</p>
-                <p class="text-subtitle-2 py-2 font-weight-thin">
-                    用于验证您身份的方式
-                </p>
+                <p class="text-subtitle-2 py-2 font-weight-thin">用于验证您身份的方式</p>
             </div>
             <v-row>
                 <v-col cols="12"> </v-col>
