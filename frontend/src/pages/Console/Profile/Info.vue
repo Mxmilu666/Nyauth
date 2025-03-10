@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { defineOptions, inject } from 'vue'
 import BasicInfoCard from './BasicInfoCard.vue'
+import MultiaccountsCard from './MultiaccountsCard.vue'
 
 defineOptions({
     name: 'InfoPage'
@@ -35,7 +36,22 @@ const avatar = inject('avatar') as string
                 <p class="text-subtitle-2 py-2 font-weight-thin">用于验证您身份的方式</p>
             </div>
             <v-row>
-                <v-col cols="12"> </v-col>
+                <v-col cols="12">
+                    <v-card class="pa-1">
+                        <v-card-title>多身份管理</v-card-title>
+                        <v-card-subtitle>管理您在 Nyauth 中的多个身份</v-card-subtitle>
+                        <v-card-text>
+                            <v-row>
+                                <v-col cols="12" sm="6" md="4" lg="2">
+                                    <MultiaccountsCard :avatar="avatar" userName="米露" />
+                                </v-col>
+                                <v-col cols="12" sm="6" md="4" lg="2">
+                                    <MultiaccountsCard :avatar="avatar" userName="米露" />
+                                </v-col>
+                            </v-row>
+                        </v-card-text>
+                    </v-card>
+                </v-col>
             </v-row>
         </div>
     </v-container>

@@ -10,9 +10,9 @@ const props = defineProps<{
 </script>
 
 <template>
-    <v-card class="d-flex flex-column align-center justify-center">
-        <v-avatar :image="avatar" />
-        <v-card-text class="username text-center">
+    <v-card class="d-flex flex-column align-center justify-center pa-1">
+        <v-avatar :image="avatar" size="70" />
+        <v-card-text class="text-center text-h6">
             {{ userName }}
         </v-card-text>
     </v-card>
