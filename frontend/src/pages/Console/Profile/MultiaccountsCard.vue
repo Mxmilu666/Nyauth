@@ -6,16 +6,41 @@ defineOptions({
 const props = defineProps<{
     avatar: string
     userName: string
+    lastActiveTime?: string
+    tagText?: string
 }>()
 </script>
 
 <template>
-    <v-card class="d-flex flex-column align-center justify-center pa-1">
-        <v-avatar :image="avatar" size="70" />
-        <v-card-text class="text-center text-h6">
-            {{ userName }}
+    <v-card>
+        <v-card-text>
+            <div class="d-flex align-center">
+                <v-avatar :image="avatar" size="60" class="me-4" />
+                <div class="d-flex flex-column justify-center">
+                    <div class="text-subtitle-1 font-weight-medium d-flex align-center">
+                        {{ userName }}
+                        <v-chip
+                            v-if="tagText"
+                            size="small"
+                            color="primary"
+                            text-color="white"
+                            class="ms-2"
+                        >
+                            <v-icon icon="mdi-label" start />
+                            {{ tagText }}
+                        </v-chip>
+                    </div>
+                    <div class="text-caption text-grey" v-if="lastActiveTime">
+                        最近授权: {{ lastActiveTime }}
+                    </div>
+                </div>
+            </div>
         </v-card-text>
     </v-card>
 </template>
 
-<style scoped></style>
+<style scoped>
+.v-chip {
+    margin-top: 1px;
+}
+</style>

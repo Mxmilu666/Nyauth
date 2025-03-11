@@ -1,13 +1,47 @@
 <script setup lang="ts">
-import { defineOptions, inject } from 'vue'
+import { defineOptions, inject, ref } from 'vue'
 import BasicInfoCard from './BasicInfoCard.vue'
-import MultiaccountsCard from './MultiaccountsCard.vue'
+import MultiaccountsContainer from './MultiaccountsContainer.vue'
 
 defineOptions({
     name: 'InfoPage'
 })
 
 const avatar = inject('avatar') as string
+
+// TODO：迁到 HOOK 里
+const accounts = ref([
+    {
+        avatar: avatar,
+        userName: '米露',
+        lastActiveTime: '昨天 18:30',
+        tagText: '主账号'
+    },
+    {
+        avatar: avatar,
+        userName: '西米',
+        lastActiveTime: '上周五 12:15',
+        tagText: 'Alist'
+    },
+    {
+        avatar: avatar,
+        userName: '喵喵',
+        lastActiveTime: '2周前',
+        tagText: 'Blog'
+    },
+    {
+        avatar: avatar,
+        userName: 'baka',
+        lastActiveTime: '2周前',
+        tagText: 'Blist'
+    }
+])
+
+// 添加创建用户函数
+const handleCreateNewUser = () => {
+    // 这里添加创建用户的逻辑
+    console.log('创建新用户')
+}
 </script>
 
 <template>
@@ -32,25 +66,12 @@ const avatar = inject('avatar') as string
                 </v-col>
             </v-row>
             <div class="ps-1 pb-3 pt-2">
-                <p class="text-h5 pt-4">Nyauth 中的其他信息和偏好设置</p>
+                <p class="text-h5 pt-4">您在 Nyauth 中的其他信息和偏好设置</p>
                 <p class="text-subtitle-2 py-2 font-weight-thin">用于验证您身份的方式</p>
             </div>
             <v-row>
                 <v-col cols="12">
-                    <v-card class="pa-1">
-                        <v-card-title>多身份管理</v-card-title>
-                        <v-card-subtitle>管理您在 Nyauth 中的多个身份</v-card-subtitle>
-                        <v-card-text>
-                            <v-row>
-                                <v-col cols="12" sm="6" md="4" lg="2">
-                                    <MultiaccountsCard :avatar="avatar" userName="米露" />
-                                </v-col>
-                                <v-col cols="12" sm="6" md="4" lg="2">
-                                    <MultiaccountsCard :avatar="avatar" userName="米露" />
-                                </v-col>
-                            </v-row>
-                        </v-card-text>
-                    </v-card>
+                    <MultiaccountsContainer :accounts="accounts" />
                 </v-col>
             </v-row>
         </div>
