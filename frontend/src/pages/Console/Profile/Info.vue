@@ -19,7 +19,7 @@ const accounts = ref([
     },
     {
         avatar: avatar,
-        userName: '西米',
+        userName: '西米米米米米米米米米米米米米米米米米米米米米米米米米',
         lastActiveTime: '上周五 12:15',
         tagText: 'Alist'
     },
@@ -36,12 +36,6 @@ const accounts = ref([
         tagText: 'Blist'
     }
 ])
-
-// 添加创建用户函数
-const handleCreateNewUser = () => {
-    // 这里添加创建用户的逻辑
-    console.log('创建新用户')
-}
 </script>
 
 <template>
