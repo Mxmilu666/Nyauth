@@ -40,6 +40,11 @@ const router = createRouter({
                     component: () => import('@/pages/Console/Security/security.vue')
                 }
             ]
+        },
+        {
+            path: '/authorize',
+            name: 'Authorize',
+            component: () => import('@/pages/Authorize/Authorize.vue')
         }
     ]
 })
