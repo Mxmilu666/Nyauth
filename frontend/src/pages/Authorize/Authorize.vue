@@ -56,7 +56,7 @@ const selectedIdentity = computed(() => {
                         :class="{ 'fill-height': $vuetify.display.smAndUp }"
                     >
                         <v-avatar size="80" class="mb-4">
-                            <v-img src="https://placehold.co/100" alt="应用图标"></v-img>
+                            <v-img src="https://placehold.co/100" alt="应用图标" />
                         </v-avatar>
                         <h3 class="text-h5 mb-2 text-white text-center">BList</h3>
                         <p class="text-body-2 mb-4 text-white text-center">
