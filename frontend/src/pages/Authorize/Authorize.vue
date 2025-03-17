@@ -136,6 +136,7 @@ const selectedIdentity = computed(() => {
                                             color="primary"
                                             class="me-1 flex-shrink-0 my-1"
                                         >
+                                            <v-icon icon="mdi-label" />
                                             {{ selectedIdentity.tagText }}
                                         </v-chip>
                                         <span
