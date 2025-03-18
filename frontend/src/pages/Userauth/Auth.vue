@@ -1,40 +1,25 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { defineOptions } from 'vue'
-import { VForm } from 'vuetify/lib/components/index.mjs'
 
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
-import { sleep } from '@/utils/common'
+import { useLogin } from '@/hooks/useLogin'
 
 defineOptions({
     name: 'AuthPage'
 })
 
-const istologin = ref(false)
-const istoregister = ref(false)
-const isLoading = ref(false)
-
-const email = ref('')
-const password = ref('')
-const otp = ref('')
-const form = ref<InstanceType<typeof VForm>>()
-
-const emailRules = [
-    (value: string) => !!value,
-    (value: string) => /.+@.+\..+/.test(value) || '请输入有效的电子邮箱'
-]
-
-const login = async () => {
-    if (!form.value) return
-    const { valid } = await form.value.validate()
-    if (!valid) return
-    isLoading.value = true
-    sleep(1000).then(() => {
-        isLoading.value = false
-        istoregister.value = true
-    })
-}
+const {
+    istologin,
+    istoregister,
+    isLoading,
+    email,
+    password,
+    otp,
+    form,
+    emailRules,
+    login
+} = useLogin()
 </script>
 
 <template>
@@ -106,7 +91,7 @@ const login = async () => {
                             <v-btn
                                 color="primary"
                                 variant="text"
-                                @click="$router.push({name: 'ResetPassword'})"
+                                @click="$router.push({ name: 'ResetPassword' })"
                                 >忘记密码</v-btn
                             >
                             <div v-if="istologin" class="d-flex align-center">
