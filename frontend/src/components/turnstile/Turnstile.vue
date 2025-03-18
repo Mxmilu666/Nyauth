@@ -55,23 +55,27 @@ watch(turnstileToken, (token) => {
 function callback(token: string) {
     emit('callback', token)
 }
+
+function closeDialog() {
+    dialog.value = false
+}
 </script>
 
 <template>
-    <v-dialog v-model="dialog" max-width="400px">
+    <v-dialog v-model="dialog" max-width="400px" persistent>
         <v-card>
-            <v-card-title>请完成人机验证</v-card-title>
+            <v-card-title class="d-flex justify-space-between align-center">
+                请完成人机验证
+                <v-btn icon size="small" variant="text" @click="closeDialog">
+                    <v-icon icon="mdi-close" />
+                </v-btn>
+            </v-card-title>
             <v-card-text
                 class="d-flex justify-center align-center"
-                style="min-height: 120px"
+                style="min-height: 100px"
             >
                 <vue-turnstile :site-key="captchaKey" v-model="turnstileToken" />
             </v-card-text>
-            <v-card-actions>
-                <v-btn color="primary" variant="text" @click="dialog = false">
-                    取消
-                </v-btn>
-            </v-card-actions>
         </v-card>
     </v-dialog>
 </template>
