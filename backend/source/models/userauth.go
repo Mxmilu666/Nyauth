@@ -18,3 +18,8 @@ type RegisterCredentials struct {
 	Code      string `json:"code"`
 	Secretkey string `json:"turnstile_secretkey"`
 }
+
+type GetAccountStatusCredentials struct {
+	Username  string `json:"username"`
+	Secretkey string `json:"turnstile_secretkey"`
+}

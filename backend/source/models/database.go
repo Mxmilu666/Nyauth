@@ -8,6 +8,7 @@ type DatabaseUser struct {
 	UserPassword string        `bson:"user_pass"`
 	Username     string        `bson:"user_name"`
 	UserEmail    string        `bson:"user_email"`
+	Avatar       string        `bson:"avatar"`
 	RegisterAt   bson.DateTime `bson:"register_at"`
 	IsBanned     bool          `bson:"is_banned"`
 	Role         string        `bson:"role"`

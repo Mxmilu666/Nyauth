@@ -76,8 +76,8 @@ func GetUserByUsername(username string) (bool, *models.DatabaseUser, error) {
 	return true, &user, nil
 }
 
-// RegisterUser 注册新用户
-func CreateUser(username, email, password string) error {
+// CreateUser 注册新用户
+func CreateUser(username, email, password, avatar string) error {
 	collection := client.Database(DatabaseName).Collection(UserCollection)
 
 	// 创建新用户对象
@@ -86,6 +86,7 @@ func CreateUser(username, email, password string) error {
 		Username:     username,
 		UserEmail:    email,
 		UserPassword: password,
+		Avatar:       avatar,
 		// 注册时间
 		RegisterAt: bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
 		IsBanned:   false,

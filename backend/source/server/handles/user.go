@@ -35,6 +35,7 @@ func UserInfo(c *gin.Context) {
 		"user_id":     user.UserID.Hex(),
 		"user_name":   user.Username,
 		"user_email":  user.UserEmail,
+		"user_avatar": user.Avatar,
 		"role":        user.Role,
 		"is_banned":   user.IsBanned,
 		"register_at": user.RegisterAt,

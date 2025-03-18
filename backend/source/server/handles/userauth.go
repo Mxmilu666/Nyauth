@@ -70,7 +70,9 @@ func UserRegister(c *gin.Context) {
 		return
 	}
 
-	err = database.CreateUser(creds.Username, creds.Useremail, creds.Password)
+	avatar := "https://cravatar.cn/avatar/" + MD5(creds.Useremail) + "?d=identicon"
+
+	err = database.CreateUser(creds.Username, creds.Useremail, creds.Password, avatar)
 	if err != nil {
 		logger.Error("Failed to create user: ", err)
 		SendResponse(c, http.StatusInternalServerError, "创建用户时出错", nil)
@@ -114,5 +116,37 @@ func SendVerificationCode(c *gin.Context) {
 		SendResponse(c, http.StatusOK, "发送验证码成功! 请注意查收~", nil)
 	default:
 		SendResponse(c, http.StatusBadRequest, "无效的参数", nil)
+	}
+}
+
+// GetAccountStatus 检查用户是否存在
+func GetAccountStatus(c *gin.Context) {
+	var query models.GetAccountStatusCredentials
+
+	if err := c.ShouldBindJSON(&query); err != nil {
+		SendResponse(c, http.StatusBadRequest, "请求无效", nil)
+		return
+	}
+
+	// 查找是否存在
+	userExists, user, err := database.GetUserByUsername(query.Username)
+	if err != nil {
+		SendResponse(c, http.StatusInternalServerError, "检查用户存在时出错", nil)
+		return
+	}
+
+	if userExists {
+		// 用户存在
+		SendResponse(c, http.StatusOK, "success", gin.H{
+			"exists": true,
+			"user_info": map[string]string{
+				"email": user.UserEmail,
+			},
+		})
+	} else {
+		// 用户不存在
+		SendResponse(c, http.StatusOK, "success", gin.H{
+			"exists": false,
+		})
 	}
 }
