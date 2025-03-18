@@ -4,6 +4,7 @@ import { defineOptions } from 'vue'
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
 import { useLogin } from '@/hooks/useLogin'
+import turnstile from '@/components/turnstile/Turnstile.vue'
 
 defineOptions({
     name: 'AuthPage'
