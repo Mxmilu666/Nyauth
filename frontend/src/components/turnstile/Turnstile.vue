@@ -14,7 +14,7 @@ const emit = defineEmits<{
 }>()
 
 const turnstileToken = ref<string>('')
-const siteKey = ref<string>('') // 默认值
+const siteKey = ref<string>('')
 
 // 计算属性监听 props.show 并触发更新
 const dialog = computed({
