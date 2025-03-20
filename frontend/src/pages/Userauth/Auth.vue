@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { defineOptions } from 'vue'
+import { ref } from 'vue'
 
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
@@ -9,6 +10,9 @@ import turnstile from '@/components/turnstile/Turnstile.vue'
 defineOptions({
     name: 'AuthPage'
 })
+
+const showTurnstile = ref(false)
+const captchaToken = ref('')
 
 const {
     istologin,
@@ -21,6 +25,30 @@ const {
     emailRules,
     login
 } = useLogin()
+
+// 记得移到 Hook
+const handleCaptchaVerify = (token: string) => {
+    captchaToken.value = token
+    showTurnstile.value = false
+    // 验证成功后继续登录
+    login()
+}
+
+const handleCaptchaError = (error: string) => {
+    console.error('验证码错误:', error)
+}
+
+const handleLogin = async () => {
+    if (!istoregister.value && !istologin.value) {
+        await login()
+        return
+    }
+
+    if (!form.value) return
+    const { valid } = await form.value.validate()
+    if (!valid) return
+    showTurnstile.value = true
+}
 </script>
 
 <template>
@@ -28,6 +56,12 @@ const {
         class="auth-wrapper fill-height d-flex align-center justify-center"
         fluid
     >
+        <turnstile
+            v-model:show="showTurnstile"
+            @callback="handleCaptchaVerify"
+            @error="handleCaptchaError"
+        />
+
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
                 <v-card :disabled="isLoading" :loading="isLoading">
@@ -84,7 +118,7 @@ const {
                             append-icon="mdi-chevron-right"
                             color="primary"
                             variant="flat"
-                            @click="login"
+                            @click="handleLogin"
                         >
                             继续
                         </v-btn>
