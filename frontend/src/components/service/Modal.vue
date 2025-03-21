@@ -35,7 +35,6 @@ const handleCancel = () => {
             <v-card-title>{{ title }}</v-card-title>
             <v-card-text>{{ content }}</v-card-text>
             <v-card-actions>
-                <v-spacer></v-spacer>
                 <v-btn color="error" variant="text" @click="handleCancel">
                     {{ cancelButtonText || '取消' }}
                 </v-btn>

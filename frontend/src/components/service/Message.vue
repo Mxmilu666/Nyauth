@@ -21,7 +21,7 @@ const handleConfirm = () => {
 </script>
 
 <template>
-    <v-snackbar v-model="snackbar">
+    <v-snackbar v-model="snackbar" location="top">
         {{ message }}
 
         <template v-slot:actions>

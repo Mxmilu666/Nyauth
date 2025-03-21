@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { VForm } from 'vuetify/lib/components/index.mjs'
 import { getAccountStatus, accountLogin } from '@/api/login'
-import { useMessageDialog } from '@/components/service/index'
+import { message } from '@/services/message'
 
 export function useLogin() {
     const istologin = ref(false)
@@ -28,7 +28,8 @@ export function useLogin() {
             const { data } = await getAccountStatus({
                 username: email.value
             })
-            if (data !== undefined) {
+            // 确保 data 和 data.data 都存在
+            if (data && data.data !== undefined) {
                 return data.data.exists
             }
             return null
@@ -71,14 +72,14 @@ export function useLogin() {
                     turnstile_secretkey: captchaToken
                 })
 
-                if (data !== undefined) {
+                if (data && data.data) {
                     // 登录成功，保存 token
                     localStorage.setItem('token', data.data.token)
                     localStorage.setItem('tokenExpiry', data.data.exp.toString())
-                    useMessageDialog('登录成功')
+                    message.info('登录成功')
                     return true
                 } else {
-                    useMessageDialog('登录失败，请重试')
+                    message.info('登录失败，请重试')
                     return false
                 }
             } catch (error: any) {
@@ -89,10 +90,9 @@ export function useLogin() {
             }
         }
 
-        // 注册逻辑 (如果需要的话)F
+        // 注册逻辑
         if (istoregister.value) {
-            // 可以在这里添加注册逻辑
-            // ...
+
         }
     }
 
