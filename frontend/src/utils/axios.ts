@@ -57,11 +57,8 @@ axios.interceptors.response.use(
             }
             // 未授权错误
             else if (status === 401) {
-                requestEvent.emit('Message', 'error', errorMsg)
                 requestEvent.emit('Unauthorized')
-                // 把 token 删掉
                 localStorage.removeItem('token')
-                router.push('/login')
             }
             // 其他客户端错误
             else {
