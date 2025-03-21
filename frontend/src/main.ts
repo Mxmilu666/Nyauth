@@ -8,10 +8,8 @@ import { createPinia } from 'pinia'
 import { createVuetify } from 'vuetify'
 import { md3 } from 'vuetify/blueprints'
 import { lightTheme, darkTheme } from './plugins/theme'
-
 import App from './App.vue'
 import router from './router'
-
 const app = createApp(App)
 const pinia = createPinia()
 const vuetify = createVuetify({
@@ -25,10 +23,15 @@ const vuetify = createVuetify({
     }
 })
 
+// Event
+import('@/event/request')
+
+// Global Function
+import('@/utils/globalMessage')
+
 app.use(pinia)
 app.use(router)
 app.use(vuetify)
-
 app.mount('#app')
 
 export { vuetify }

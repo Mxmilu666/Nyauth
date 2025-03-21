@@ -19,6 +19,22 @@ func UserLogin(c *gin.Context) {
 		return
 	}
 
+	// 验证Turnstile验证码
+	if creds.Secretkey == "" {
+		SendResponse(c, http.StatusBadRequest, "验证码不能为空", nil)
+		return
+	}
+
+	success, err := VerifyTurnstile(creds.Secretkey)
+	if err != nil {
+		SendResponse(c, http.StatusInternalServerError, "验证码验证过程出错", nil)
+		return
+	}
+	if !success {
+		SendResponse(c, http.StatusBadRequest, "验证码验证失败", nil)
+		return
+	}
+
 	userExists, user, err := database.GetUserByUsername(creds.Username)
 	if err != nil {
 		SendResponse(c, http.StatusInternalServerError, "检查用户存在时出错，数据库爆炸啦！", nil)

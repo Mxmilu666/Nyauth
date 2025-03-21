@@ -1,7 +1,7 @@
 import axios from 'axios'
 import requestEvent from '@/event/request'
 
-export type Response<T = any> = { status: number; msg: string; data: T; type?: string }
+export type Response<T = any> = { msg?: string; data?: T; type?: string }
 
 // 默认配置
 axios.defaults.baseURL = import.meta.env.VITE_HTTP_BASE_URL || '/api/v0'
@@ -28,25 +28,7 @@ axios.interceptors.request.use(
 // 响应拦截器
 axios.interceptors.response.use(
     (response) => {
-        const responseData = response.data as Response
-
-        // 处理服务器错误
-        if (responseData?.status >= 500 && responseData?.status <= 599) {
-            requestEvent.emit('UnknownError')
-        }
-
-        // 处理未授权错误
-        if (responseData?.status == 401) {
-            requestEvent.emit('Unauthorized')
-            // 把 token 删掉
-            localStorage.removeItem('token')
-        }
-
-        // 处理特定消息错误
-        if (responseData?.status === 418) {
-            requestEvent.emit('Message', responseData?.type, responseData?.msg)
-        }
-
+        // 200状态码不显示消息，直接返回
         return response
     },
     async (error) => {
@@ -56,22 +38,38 @@ axios.interceptors.response.use(
         if (error.code === 'ERR_NETWORK') {
             // 网络异常
             requestEvent.emit('NetworkError')
-        } else if (error.response) {
-            // 其他响应码
-            const { status } = error.response
+            return Promise.reject(error)
+        }
 
-            if (status === 401) {
-                requestEvent.emit('Unauthorized')
-                // 清除本地保存的 token
-                localStorage.removeItem('token')
-            } else {
+        // 有响应但状态码不是2xx
+        if (error.response) {
+            const { status } = error.response
+            const responseData = error.response.data as Response
+            const errorMsg = responseData?.msg || `错误 ${status}`
+
+            // 服务器错误
+            if (status >= 500 && status <= 599) {
+                requestEvent.emit('Message', 'error', errorMsg)
                 requestEvent.emit('UnknownError')
+            }
+            // 未授权错误
+            else if (status === 401) {
+                requestEvent.emit('Message', 'error', errorMsg)
+                requestEvent.emit('Unauthorized')
+                // 把 token 删掉
+                localStorage.removeItem('token')
+            }
+            // 其他客户端错误
+            else {
+                // 显示错误消息
+                requestEvent.emit('Message', 'error', errorMsg)
             }
 
             console.error(`请求错误: ${status}`, error.response.data)
         } else {
             // 其他错误
             requestEvent.emit('UnknownError')
+            requestEvent.emit('Message', 'error', '未知错误，请稍后重试')
         }
 
         return Promise.reject(error)

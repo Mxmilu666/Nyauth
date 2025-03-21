@@ -1,7 +1,7 @@
 import { ref } from 'vue'
 import { VForm } from 'vuetify/lib/components/index.mjs'
-import { getAccountStatus } from '@/api/login'
-import { sleep } from '@/utils/common'
+import { getAccountStatus, accountLogin } from '@/api/login'
+import { useMessageDialog } from '@/components/service/index'
 
 export function useLogin() {
     const istologin = ref(false)
@@ -40,7 +40,7 @@ export function useLogin() {
         }
     }
 
-    const login = async () => {
+    const login = async (captchaToken: string): Promise<boolean | void> => {
         if (!istoregister.value && !istologin.value) {
             isLoading.value = true
             const accountExists = await checkAccount()
@@ -60,6 +60,40 @@ export function useLogin() {
         if (!form.value) return
         const { valid } = await form.value.validate()
         if (!valid) return
+
+        // 登录逻辑
+        if (istologin.value) {
+            isLoading.value = true
+            try {
+                const { data } = await accountLogin({
+                    username: email.value,
+                    password: password.value,
+                    turnstile_secretkey: captchaToken
+                })
+
+                if (data !== undefined) {
+                    // 登录成功，保存 token
+                    localStorage.setItem('token', data.data.token)
+                    localStorage.setItem('tokenExpiry', data.data.exp.toString())
+                    useMessageDialog('登录成功')
+                    return true
+                } else {
+                    useMessageDialog('登录失败，请重试')
+                    return false
+                }
+            } catch (error: any) {
+                console.error('登录失败:', error)
+                return false
+            } finally {
+                isLoading.value = false
+            }
+        }
+
+        // 注册逻辑 (如果需要的话)F
+        if (istoregister.value) {
+            // 可以在这里添加注册逻辑
+            // ...
+        }
     }
 
     return {

@@ -30,8 +30,7 @@ const {
 const handleCaptchaVerify = (token: string) => {
     captchaToken.value = token
     showTurnstile.value = false
-    // 验证成功后继续登录
-    login()
+    login(captchaToken.value)
 }
 
 const handleCaptchaError = (error: string) => {
@@ -40,7 +39,7 @@ const handleCaptchaError = (error: string) => {
 
 const handleLogin = async () => {
     if (!istoregister.value && !istologin.value) {
-        await login()
+        await login(captchaToken.value)
         return
     }
 
@@ -100,7 +99,7 @@ const handleLogin = async () => {
                                 required
                             />
                             <v-slide-y-transition>
-                                <loginform v-if="istologin" :password="password" />
+                                <loginform v-if="istologin" v-model="password" />
                                 <otpform
                                     v-if="istoregister"
                                     :email="email"

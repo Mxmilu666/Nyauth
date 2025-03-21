@@ -6,19 +6,20 @@ defineOptions({
 })
 
 const props = defineProps({
-    password: {
+    modelValue: {
         type: String,
         required: true
     }
 })
 
-const emit = defineEmits(["enter"])
+const emit = defineEmits(['update:modelValue', 'enter'])
 </script>
 
 <template>
     <v-text-field
         label="密码"
-        :v-model="props.password"
+        :value="modelValue"
+        @update:model-value="value => emit('update:modelValue', value)"
         color="primary"
         type="password"
         prepend-inner-icon="mdi-key-outline"
