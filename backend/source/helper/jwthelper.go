@@ -95,10 +95,12 @@ func (j *JwtHelperCert) loadKeys() error {
 
 // 签发 JWT
 func (j *JwtHelperCert) IssueToken(payload map[string]interface{}, audience string, expiresInSeconds int64) (string, error) {
+	now := time.Now()
 	token := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"aud":  audience,
 		"iss":  "Nyauth-Server",
-		"exp":  time.Now().Add(time.Duration(expiresInSeconds) * time.Second).Unix(),
+		"iat":  now.Unix(),
+		"exp":  now.Add(time.Duration(expiresInSeconds) * time.Second).Unix(),
 		"data": payload,
 	})
 	return token.SignedString(j.privateKey)
@@ -111,11 +113,12 @@ func (j *JwtHelperCert) VerifyToken(tokenString string, audience string) (*jwt.T
 			return nil, errors.New("unexpected signing method")
 		}
 		return j.publicKey, nil
-	}, jwt.WithAudience(audience))
+	}, jwt.WithAudience(audience), jwt.WithIssuedAt(), jwt.WithExpirationRequired())
 
 	if err != nil {
 		return nil, err
 	}
+
 	return token, nil
 }
 
