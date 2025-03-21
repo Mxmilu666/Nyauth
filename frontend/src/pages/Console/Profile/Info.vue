@@ -2,12 +2,14 @@
 import { defineOptions, inject, ref } from 'vue'
 import BasicInfoCard from './BasicInfoCard.vue'
 import MultiaccountsContainer from './MultiaccountsContainer.vue'
+import { useUserStore } from '@/stores/user'
 
 defineOptions({
     name: 'InfoPage'
 })
 
 const avatar = inject('avatar') as string
+const userStore = useUserStore()
 
 // TODO：迁到 HOOK 里
 const accounts = ref([
@@ -53,9 +55,9 @@ const accounts = ref([
                 <v-col cols="12">
                     <BasicInfoCard
                         :avatar="avatar"
-                        username="米露"
-                        email="milu@milu.moe"
-                        userId="1145141919810"
+                        :username="userStore.userInfo.user_name || 'Baka'"
+                        :email="userStore.userInfo.user_email || 'Baka'"
+                        :userId="userStore.userInfo.user_id || 'Baka'"
                     />
                 </v-col>
             </v-row>

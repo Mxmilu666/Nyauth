@@ -1,16 +1,28 @@
 <script setup lang="ts">
-import { defineOptions, ref, provide } from 'vue'
+import { defineOptions, ref, provide, onMounted, computed } from 'vue'
 import defineAvatar from '@/assets/logo/512x.png'
+import { useUser } from '@/hooks/useUser'
+import { useUserStore } from '@/stores/user'
 
 defineOptions({
     name: 'ConsolePage'
 })
 
 const drawer = ref(true)
+const { fetchUserInfo } = useUser()
+const userStore = useUserStore()
 
-const avatar = defineAvatar
+// 使用默认头像，如果有用户头像则使用用户头像
+const avatar = computed(() => {
+    return userStore.userInfo.user_avatar || defineAvatar
+})
 
+// 提供头像给子组件使用
 provide('avatar', avatar)
+
+onMounted(() => {
+    fetchUserInfo()
+})
 </script>
 
 <template>
@@ -23,8 +35,8 @@ provide('avatar', avatar)
         <v-list>
             <v-list-item
                 :prepend-avatar="avatar"
-                subtitle="milu@milu.ink"
-                title="Mxmilu"
+                :subtitle="userStore.userInfo.user_email || '未登录'"
+                :title="userStore.userInfo.user_name || 'Baka'"
             />
         </v-list>
 

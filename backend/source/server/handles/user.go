@@ -41,5 +41,10 @@ func UserInfo(c *gin.Context) {
 		"register_at": user.RegisterAt,
 	}
 
-	SendResponse(c, http.StatusOK, "success", userInfo)
+	// 将用户信息封装在 user_info 对象中
+	response := map[string]interface{}{
+		"user_info": userInfo,
+	}
+
+	SendResponse(c, http.StatusOK, "success", response)
 }

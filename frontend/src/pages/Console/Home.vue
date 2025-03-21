@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { defineOptions } from 'vue'
 import { useConsole } from '@/hooks/useConsole'
+import { useUserStore } from '@/stores/user'
 
 defineOptions({
     name: 'HomePage'
 })
+
+const userStore = useUserStore()
 
 const { avatar, timeGreeting } = useConsole()
 </script>
@@ -12,7 +15,9 @@ const { avatar, timeGreeting } = useConsole()
 <template>
     <v-container class="center">
         <v-avatar :image="avatar" size="110"></v-avatar>
-        <p class="text-h5 pt-4 font-weight-bold">Mxmilu，{{ timeGreeting }}</p>
+        <p class="text-h5 pt-4 font-weight-bold">
+            {{ userStore.userInfo.user_name || 'Baka' }}，{{ timeGreeting }}
+        </p>
         <p class="text-subtitle-1 py-2">
             管理自己的信息、隐私和安全，创建应用程序、开发等更多玩法
         </p>

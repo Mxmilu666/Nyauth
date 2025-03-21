@@ -2,8 +2,10 @@ import { ref } from 'vue'
 import { VForm } from 'vuetify/lib/components/index.mjs'
 import { getAccountStatus, accountLogin } from '@/api/login'
 import { message } from '@/services/message'
+import { useRouter } from 'vue-router'
 
 export function useLogin() {
+    const router = useRouter()
     const istologin = ref(false)
     const istoregister = ref(false)
     const isLoading = ref(false)
@@ -77,6 +79,7 @@ export function useLogin() {
                     localStorage.setItem('token', data.data.token)
                     localStorage.setItem('tokenExpiry', data.data.exp.toString())
                     message.info('登录成功')
+                    router.push('/console')
                     return true
                 } else {
                     message.info('登录失败，请重试')
@@ -92,7 +95,6 @@ export function useLogin() {
 
         // 注册逻辑
         if (istoregister.value) {
-
         }
     }
 

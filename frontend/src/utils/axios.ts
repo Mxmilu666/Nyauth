@@ -1,5 +1,8 @@
 import axios from 'axios'
 import requestEvent from '@/event/request'
+import { useRouter } from 'vue-router'
+
+const router = useRouter()
 
 export type Response<T = any> = { msg?: string; data?: T; type?: string }
 
@@ -58,6 +61,7 @@ axios.interceptors.response.use(
                 requestEvent.emit('Unauthorized')
                 // 把 token 删掉
                 localStorage.removeItem('token')
+                router.push('/login')
             }
             // 其他客户端错误
             else {
