@@ -2,7 +2,7 @@ import { ref, watch } from 'vue'
 import { VForm } from 'vuetify/lib/components/index.mjs'
 import { getAccountStatus, accountLogin } from '@/api/login'
 import { message } from '@/services/message'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 
 // 表单状态和验证相关钩子
 export function useLoginForm() {
@@ -89,6 +89,7 @@ export function useAuthFlow() {
 export function useLoginOperation() {
     const isLoading = ref(false)
     const router = useRouter()
+    const route = useRoute()
 
     const performLogin = async (
         email: string,
@@ -108,7 +109,11 @@ export function useLoginOperation() {
                 localStorage.setItem('token', data.data.token)
                 localStorage.setItem('tokenExpiry', data.data.exp.toString())
                 message.info('登录成功')
-                router.push('/console')
+                if (route.query.redirect) {
+                    router.push(route.query.redirect as string)
+                } else {
+                    router.push('/console')
+                }
                 return true
             } else {
                 message.info('登录失败，请重试')

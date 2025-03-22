@@ -57,7 +57,10 @@ router.beforeEach((to, from, next) => {
         const token = localStorage.getItem('token')
         if (!token) {
             // 无token，重定向到登录页
-            next({ name: 'Login' })
+            next({
+                name: 'Login',
+                query: { redirect: to.fullPath }
+            })
             return
         }
     }
