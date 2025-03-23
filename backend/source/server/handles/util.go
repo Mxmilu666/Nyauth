@@ -1,8 +1,6 @@
 package handles
 
 import (
-	"crypto/md5"
-	"encoding/hex"
 	"net/http"
 	"nyauth_backed/source/helper"
 	"strings"
@@ -60,10 +58,4 @@ func JWTMiddleware(audience string) gin.HandlerFunc {
 		c.Set("jwtClaims", token.Claims)
 		c.Next()
 	}
-}
-
-func MD5(text string) string {
-	hasher := md5.New()
-	hasher.Write([]byte(strings.ToLower(text)))
-	return hex.EncodeToString(hasher.Sum(nil))
 }

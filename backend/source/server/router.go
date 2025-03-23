@@ -27,7 +27,7 @@ func initRouter(r *gin.Engine) *gin.Engine {
 			auth.POST("/register", handles.UserRegister)
 		}
 
-		// 这个记得改成 jwt 校验（登录注册时也要发临时 jwt 过来），要不然会出事
+		// 这个记得改成加个验证码
 		api.POST("/account/sendcode", handles.SendVerificationCode)
 
 		api.POST("/account/getaccountstatus", handles.GetAccountStatus)
@@ -35,6 +35,11 @@ func initRouter(r *gin.Engine) *gin.Engine {
 		account := api.Group("/account", handles.JWTMiddleware("user"))
 		{
 			account.GET("/info", handles.UserInfo)
+		}
+
+		oauth := api.Group("/oauth", handles.JWTMiddleware("user"))
+		{
+			oauth.POST("/authorize", handles.OAuthAuthorize)
 		}
 	}
 	return r

@@ -7,6 +7,7 @@ import (
 	"nyauth_backed/source/helper"
 	"nyauth_backed/source/logger"
 	"nyauth_backed/source/models"
+	"nyauth_backed/source/untils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -86,7 +87,7 @@ func UserRegister(c *gin.Context) {
 		return
 	}
 
-	avatar := "https://cravatar.cn/avatar/" + MD5(creds.Useremail) + "?d=identicon"
+	avatar := "https://cravatar.cn/avatar/" + untils.MD5(creds.Useremail) + "?d=identicon"
 
 	err = database.CreateUser(creds.Username, creds.Useremail, creds.Password, avatar)
 	if err != nil {
