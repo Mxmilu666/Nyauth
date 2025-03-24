@@ -35,6 +35,11 @@ func initRouter(r *gin.Engine) *gin.Engine {
 		account := api.Group("/account", handles.JWTMiddleware("user"))
 		{
 			account.GET("/info", handles.UserInfo)
+
+			multiAccount := account.Group("/multi")
+			{
+				multiAccount.GET("/info", handles.OAuthAuthorize)
+			}
 		}
 
 		oauth := api.Group("/oauth", handles.JWTMiddleware("user"))
