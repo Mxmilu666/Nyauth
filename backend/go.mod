@@ -4,7 +4,7 @@ go 1.23.2
 
 require (
 	github.com/gin-gonic/gin v1.10.0
-	github.com/golang-jwt/jwt/v5 v5.2.1
+	github.com/golang-jwt/jwt/v5 v5.2.2
 	go.mongodb.org/mongo-driver/v2 v2.1.0
 	gopkg.in/gomail.v2 v2.0.0-20160411212932-81ebce5c23df
 )
