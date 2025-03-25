@@ -129,3 +129,30 @@ func GetUserByID(userID string) (*models.DatabaseUser, error) {
 
 	return &user, nil
 }
+
+// UpdateUser 通过用户ID更新用户信息
+func UpdateUser(userID string, updates map[string]interface{}) error {
+	collection := client.Database(DatabaseName).Collection(UserCollection)
+
+	// 将字符串类型的 userID 转换为 ObjectID
+	objID, err := bson.ObjectIDFromHex(userID)
+	if err != nil {
+		return fmt.Errorf("invalid user ID: %w", err)
+	}
+
+	// 创建更新文档
+	update := bson.M{"$set": updates}
+
+	// 执行更新操作
+	_, err = collection.UpdateOne(
+		context.TODO(),
+		bson.M{"_id": objID},
+		update,
+	)
+
+	if err != nil {
+		return fmt.Errorf("failed to update user information: %w", err)
+	}
+
+	return nil
+}

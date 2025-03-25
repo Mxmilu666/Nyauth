@@ -34,10 +34,15 @@ func initRouter(r *gin.Engine) *gin.Engine {
 
 		account := api.Group("/account", handles.JWTMiddleware("user"))
 		{
+			// 获取用户信息
 			account.GET("/info", handles.UserInfo)
+			// 修改用户名
+			account.POST("/update/username", handles.UpdateUsername)
 
+			// 多用户
 			multiAccount := account.Group("/multi")
 			{
+				// 获取多用户信息
 				multiAccount.GET("/info", handles.OAuthAuthorize)
 			}
 		}

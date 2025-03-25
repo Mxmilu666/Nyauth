@@ -16,3 +16,7 @@ export const getAccountInfo = () => {
         }>
     >('/account/info')
 }
+
+export const updateUsername = (data: { username: string }) => {
+    return axios.post<Response<{}>>('/account/update/username', data)
+}
