@@ -33,6 +33,7 @@ func UserInfo(c *gin.Context) {
 	// 输出格式
 	userInfo := map[string]interface{}{
 		"user_id":     user.UserID.Hex(),
+		"user_uuid":   user.UserUUID,
 		"user_name":   user.Username,
 		"user_email":  user.UserEmail,
 		"user_avatar": user.Avatar,

@@ -9,6 +9,7 @@ export interface UserInfo {
   user_avatar: string
   user_email: string
   user_id: string
+  user_uuid: string
   user_name: string
 }
 
@@ -21,6 +22,7 @@ export const useUserStore = defineStore('user', () => {
     user_avatar: '',
     user_email: '',
     user_id: '',
+    user_uuid: '',
     user_name: ''
   })
   

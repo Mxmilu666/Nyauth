@@ -10,6 +10,7 @@ export const getAccountInfo = () => {
                 user_avatar: string
                 user_email: string
                 user_id: string
+                user_uuid: string
                 user_name: string
             }
         }>

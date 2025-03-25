@@ -17,6 +17,7 @@ require github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // in
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
+	github.com/google/uuid v1.6.0 // indirect
 	github.com/klauspost/compress v1.16.7 // indirect
 	github.com/xdg-go/pbkdf2 v1.0.0 // indirect
 	github.com/xdg-go/scram v1.1.2 // indirect

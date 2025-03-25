@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import BasicInfoItem from './BasicInfoItem.vue'
+import { modal } from '@/services/modal'
 
 defineOptions({
     name: 'BasicInfoCard'
@@ -12,8 +13,14 @@ interface Props {
     userId: string
 }
 const props = defineProps<Props>()
-</script>
 
+const changeAvatar = () => {
+    modal.show({
+        title: '请前往 Cravatar 更换头像',
+        content: 'Nyauth 使用 Cravatar 作为头像提供商，您可前往 Cravatar 更换头像'
+    })
+}
+</script>
 
 <template>
     <v-card class="pa-1">
@@ -24,11 +31,12 @@ const props = defineProps<Props>()
                 label="用户头像"
                 content="更换用户头像可帮助您个性化您的账号"
                 :avatar="avatar"
+                @click="changeAvatar"
             />
             <BasicInfoItem
                 label="用户名"
                 :content="props.username"
-                @click="() => $router.push({ name: 'UserProfile' })"
+                @click="() => $router.push({ name: 'UsernameInfoPage' })"
             />
             <BasicInfoItem
                 label="电子邮件"

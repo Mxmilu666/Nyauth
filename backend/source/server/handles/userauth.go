@@ -87,7 +87,7 @@ func UserRegister(c *gin.Context) {
 		return
 	}
 
-	avatar := "https://cravatar.cn/avatar/" + untils.MD5(creds.Useremail) + "?d=identicon"
+	avatar := "https://cravatar.cn/avatar/" + untils.MD5(creds.Useremail) + "?d=identicon&s=256"
 
 	err = database.CreateUser(creds.Username, creds.Useremail, creds.Password, avatar)
 	if err != nil {

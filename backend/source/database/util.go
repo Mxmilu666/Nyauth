@@ -8,6 +8,7 @@ import (
 	"nyauth_backed/source"
 	"nyauth_backed/source/logger"
 	"nyauth_backed/source/models"
+	"nyauth_backed/source/untils"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
@@ -80,13 +81,17 @@ func GetUserByUsername(username string) (bool, *models.DatabaseUser, error) {
 func CreateUser(username, email, password, avatar string) error {
 	collection := client.Database(DatabaseName).Collection(UserCollection)
 
+	objectId := bson.NewObjectID()
+
 	// 创建新用户对象
 	user := &models.DatabaseUser{
-		UserID:       bson.NewObjectID(),
+		UserID:       objectId,
+		UserUUID:     untils.ToUUIDv5(objectId.Hex()),
 		Username:     username,
 		UserEmail:    email,
 		UserPassword: password,
 		Avatar:       avatar,
+
 		// 注册时间
 		RegisterAt: bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
 		IsBanned:   false,

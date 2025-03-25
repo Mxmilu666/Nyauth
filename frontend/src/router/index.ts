@@ -35,6 +35,11 @@ const router = createRouter({
                     component: () => import('@/pages/Console/Profile/Info.vue')
                 },
                 {
+                    path: 'info/username',
+                    name: 'UsernameInfoPage',
+                    component: () => import('@/pages/Console/Profile/Detail/UserName.vue')
+                },
+                {
                     path: 'security',
                     name: 'SecurityPage',
                     component: () => import('@/pages/Console/Security/security.vue')

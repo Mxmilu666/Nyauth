@@ -57,7 +57,7 @@ const accounts = ref([
                         :avatar="avatar"
                         :username="userStore.userInfo.user_name || 'Baka'"
                         :email="userStore.userInfo.user_email || 'Baka'"
-                        :userId="userStore.userInfo.user_id || 'Baka'"
+                        :userId="userStore.userInfo.user_uuid || 'Baka'"
                     />
                 </v-col>
             </v-row>
