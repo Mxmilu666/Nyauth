@@ -11,7 +11,7 @@ defineOptions({
         <app-bar />
         <v-main>
             <router-view v-slot="{ Component, route }">
-                <v-fade-transition>
+                <v-fade-transition :leave-absolute="true">
                     <div :key="route.name">
                         <component :is="Component" />
                     </div>
