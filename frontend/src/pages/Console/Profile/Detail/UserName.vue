@@ -1,31 +1,27 @@
 <script setup lang="ts">
 import { defineOptions, ref, watch } from 'vue'
-import { useUserStore } from '@/stores/user'
+import { useUser } from '@/hooks/useUser'
 import { message } from '@/services/message'
 
-defineOptions({
-    name: 'UserNamePage'
-})
-
-const userStore = useUserStore()
+const { userInfo, updateUserName } = useUser()
 
 const isEditing = ref(false)
 const loading = ref(false)
 
-const userName = ref('Baka！ 你还没设置用户名呢')  // 默认值
+const userName = ref('Baka！ 你还没设置用户名呢') // 默认值
 const newUserName = ref('')
 
 watch(
-  () => userStore.userInfo.user_name,
-  (newValue) => {
-    if (newValue) {
-      userName.value = newValue
-      if (!isEditing.value) {
-        newUserName.value = newValue
-      }
-    }
-  },
-  { immediate: true }
+    () => userInfo.user_name,
+    (newValue) => {
+        if (newValue) {
+            userName.value = newValue
+            if (!isEditing.value) {
+                newUserName.value = newValue
+            }
+        }
+    },
+    { immediate: true }
 )
 
 const startEditing = () => {
@@ -51,17 +47,14 @@ const saveUserName = async () => {
 
     loading.value = true
     try {
-        // 这里添加实际的API
-
-        // 模拟API调用
-        await new Promise((resolve) => setTimeout(resolve, 800))
-
-        userName.value = newUserName.value
-        userStore.userInfo.user_name = newUserName.value
-        message.info('用户名已成功更新')
-        isEditing.value = false
-    } catch (error) {
-        message.info('用户名更新失败')
+        const result = await updateUserName(newUserName.value)
+        if (result.success) {
+            userName.value = newUserName.value
+            message.info(result.message)
+            isEditing.value = false
+        } else {
+            message.info(result.message)
+        }
     } finally {
         loading.value = false
     }
