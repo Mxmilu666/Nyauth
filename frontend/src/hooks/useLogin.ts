@@ -65,23 +65,33 @@ export function useAccountCheck() {
 export function useAuthFlow() {
     const istologin = ref(false)
     const istoregister = ref(false)
+    const isOtpVerified = ref(false)
 
     const setAuthMode = (exists: boolean | null) => {
         if (exists === true) {
             // 账户存在，显示登录表单
             istologin.value = true
             istoregister.value = false
+            isOtpVerified.value = false
         } else if (exists === false) {
             // 账户不存在，显示注册表单
             istologin.value = false
             istoregister.value = true
+            isOtpVerified.value = false
         }
+    }
+
+    const completeOtpVerification = () => {
+        // OTP 验证完成后，将状态设置为已验证，进入密码设置阶段
+        isOtpVerified.value = true
     }
 
     return {
         istologin,
         istoregister,
-        setAuthMode
+        isOtpVerified,
+        setAuthMode,
+        completeOtpVerification
     }
 }
 
@@ -136,7 +146,13 @@ export function useLoginOperation() {
 export function useLogin() {
     const { form, email, password, otp, emailRules, validateForm } = useLoginForm()
     const { isLoading: isCheckingAccount, checkAccount } = useAccountCheck()
-    const { istologin, istoregister, setAuthMode } = useAuthFlow()
+    const { 
+        istologin, 
+        istoregister, 
+        isOtpVerified, 
+        setAuthMode, 
+        completeOtpVerification 
+    } = useAuthFlow()
     const { isLoading: isLoggingIn, performLogin } = useLoginOperation()
 
     // 合并loading状态
@@ -165,21 +181,24 @@ export function useLogin() {
         }
 
         // 注册逻辑
-        if (istoregister.value) {
-            // 注册逻辑待实现
-            return false
+        if (istoregister.value && isOtpVerified.value) {
+            // 注册逻辑待实现 - 这里应该调用注册API
+            // 暂时复用登录API
+            return await performLogin(email.value, password.value, captchaToken)
         }
     }
 
     return {
         istologin,
         istoregister,
+        isOtpVerified,
         isLoading,
         email,
         password,
         otp,
         form,
         emailRules,
-        login
+        login,
+        completeOtpVerification
     }
 }

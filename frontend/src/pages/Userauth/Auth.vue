@@ -4,8 +4,10 @@ import { ref } from 'vue'
 
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
+import passwordSetForm from './PasswordSetForm.vue'
 import { useLogin } from '@/hooks/useLogin'
 import turnstile from '@/components/turnstile/Turnstile.vue'
+import { message } from '@/services/message'
 
 defineOptions({
     name: 'AuthPage'
@@ -13,20 +15,25 @@ defineOptions({
 
 const showTurnstile = ref(false)
 const captchaToken = ref('')
+const otpVerifying = ref(false)
+const currentOtp = ref('')
 
 const {
     istologin,
     istoregister,
+    isOtpVerified,
     isLoading,
     email,
     password,
     otp,
     form,
     emailRules,
-    login
+    login,
+    completeOtpVerification,
+    
 } = useLogin()
 
-// 记得移到 Hook
+// 处理验证码验证
 const handleCaptchaVerify = (token: string) => {
     captchaToken.value = token
     showTurnstile.value = false
@@ -37,16 +44,68 @@ const handleCaptchaError = (error: string) => {
     console.error('验证码错误:', error)
 }
 
+// 统一处理所有登录/注册流程
 const handleLogin = async () => {
+    // 邮箱输入阶段：检查账户状态并进入相应流程
     if (!istoregister.value && !istologin.value) {
         await login(captchaToken.value)
         return
     }
 
-    if (!form.value) return
-    const { valid } = await form.value.validate()
-    if (!valid) return
-    showTurnstile.value = true
+    // 登录阶段：验证表单并请求登录
+    if (istologin.value) {
+        if (!form.value) return
+        const { valid } = await form.value.validate()
+        if (!valid) return
+        showTurnstile.value = true
+        return
+    }
+
+    // 注册阶段（OTP验证）：验证OTP
+    if (istoregister.value && !isOtpVerified.value) {
+        if (!currentOtp.value || currentOtp.value.length < 6) {
+            message.info('请输入完整的验证码')
+            return
+        }
+
+        otpVerifying.value = true
+        try {
+            // const verified = await verifyOtp(email.value, currentOtp.value)
+            const verified = true
+            if (verified) {
+                // OTP 验证成功，进入密码设置环节
+                completeOtpVerification()
+                message.info('验证码验证成功')
+            } else {
+                // OTP 验证失败
+                message.info('验证码验证失败，请检查后重试')
+            }
+        } catch (error) {
+            console.error('OTP验证出错:', error)
+            message.info('验证码验证过程中出现错误')
+        } finally {
+            otpVerifying.value = false
+        }
+        return
+    }
+
+    // 注册阶段（密码设置）：验证表单并提交注册
+    if (istoregister.value && isOtpVerified.value) {
+        if (!form.value) return
+        const { valid } = await form.value.validate()
+        if (!valid) return
+        showTurnstile.value = true
+        return
+    }
+}
+
+// 从OTP组件接收验证码
+const handleOtpInput = (otpCode: string) => {
+    currentOtp.value = otpCode
+    // 如果已经输入了完整的6位验证码，可以自动触发验证
+    if (otpCode.length === 6) {
+        handleLogin()
+    }
 }
 </script>
 
@@ -63,7 +122,7 @@ const handleLogin = async () => {
 
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
-                <v-card :disabled="isLoading" :loading="isLoading">
+                <v-card :disabled="isLoading || otpVerifying" :loading="isLoading || otpVerifying">
                     <template v-slot:loader="{ isActive }">
                         <v-progress-linear
                             :active="isActive"
@@ -82,7 +141,8 @@ const handleLogin = async () => {
                             <p v-if="!istoregister" class="text-h5">
                                 登录到 <strong>Nyauth</strong>
                             </p>
-                            <p v-else class="text-h5">注册到 <strong>Nyauth</strong></p>
+                            <p v-else-if="istoregister && !isOtpVerified" class="text-h5">注册到 <strong>Nyauth</strong></p>
+                            <p v-else class="text-h5">完成注册 <strong>Nyauth</strong></p>
                         </div>
                     </v-card-title>
                     <v-card-text>
@@ -95,16 +155,22 @@ const handleLogin = async () => {
                                 prepend-inner-icon="mdi-email-outline"
                                 variant="outlined"
                                 :rules="emailRules"
-                                @keyup.enter="login"
+                                @keyup.enter="handleLogin"
                                 required
                             />
-                            <v-slide-y-transition>
+                            <v-slide-y-transition :leave-absolute="true">
                                 <loginform v-if="istologin" v-model="password" />
                                 <otpform
-                                    v-if="istoregister"
+                                    v-if="istoregister && !isOtpVerified"
                                     :email="email"
                                     :otp="otp"
-                                    @enter="login"
+                                    :loading="otpVerifying"
+                                    @otpEnter="handleOtpInput"
+                                />
+                                <passwordSetForm
+                                    v-if="istoregister && isOtpVerified"
+                                    v-model:password="password"
+                                    @enter="handleLogin"
                                 />
                             </v-slide-y-transition>
                         </v-form>
@@ -118,8 +184,13 @@ const handleLogin = async () => {
                             color="primary"
                             variant="flat"
                             @click="handleLogin"
+                            :loading="otpVerifying"
+                            :disabled="otpVerifying"
                         >
-                            继续
+                            {{ 
+                                istoregister && !isOtpVerified ? '验证' : 
+                                istoregister && isOtpVerified ? '注册' : '继续' 
+                            }}
                         </v-btn>
                         <div class="d-flex justify-space-between w-100 mt-1">
                             <v-btn

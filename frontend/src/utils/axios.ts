@@ -1,8 +1,5 @@
 import axios from 'axios'
 import requestEvent from '@/event/request'
-import { useRouter } from 'vue-router'
-
-const router = useRouter()
 
 export type Response<T = any> = { msg?: string; data?: T; type?: string }
 
