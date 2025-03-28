@@ -1,6 +1,7 @@
 package helper
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"sync"
@@ -10,6 +11,8 @@ import (
 
 	"gopkg.in/gomail.v2"
 )
+
+var ErrVerificationCodeExists = errors.New("verification code already exists and has not expired")
 
 // 验证码结构体，包含验证码和过期时间
 type VerificationCode struct {
@@ -60,6 +63,16 @@ func SendEmail(to, subject, body string) error {
 
 // SendVerificationCodeByEmail 发送验证码到用户的电子邮件
 func SendVerificationCodeByEmail(to, usefor string) error {
+	// 检查是否存在未过期的验证码
+	codeCache.RLock()
+	existingCode, exists := codeCache.m[to]
+	codeCache.RUnlock()
+
+	// 如果已存在未过期的验证码且用途相同，则不发送验证码防止被刷爆接口
+	if exists && time.Now().Before(existingCode.ExpiresAt) && existingCode.UseFor == usefor {
+		return fmt.Errorf("%w: please check your email or wait for expiration", ErrVerificationCodeExists)
+	}
+
 	// 生成验证码
 	code := generateVerificationCode()
 
@@ -76,9 +89,24 @@ func SendVerificationCodeByEmail(to, usefor string) error {
 	}
 	codeCache.Unlock()
 
-	// 发送验证码到用户的电子邮件
-	subject := "[Nyauth] 你的验证码来啦~ 请查收!"
-	body := fmt.Sprintf("您的验证码为: %s, 有效期为：%d 分钟, 千万不要泄露给他人哦!", code, expirationMinutes)
+	var subject string
+	var useType string
+
+	switch usefor {
+	case "register":
+		useType = "注册"
+	case "reset_password":
+		useType = "重置密码"
+	default:
+		return fmt.Errorf("invalid usefor: %s", usefor)
+	}
+
+	subject = fmt.Sprintf("[Nyauth] 你的%s验证码来啦~ 请查收!", useType)
+	body := fmt.Sprintf("您的%s验证码为: %s, 有效期为：%d 分钟, 千万不要泄露给他人哦!",
+		useType,
+		code,
+		expirationMinutes)
+
 	if err := SendEmail(to, subject, body); err != nil {
 		return fmt.Errorf("failed to send verification code: %w", err)
 	}

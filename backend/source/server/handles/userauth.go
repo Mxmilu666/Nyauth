@@ -1,6 +1,7 @@
 package handles
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 	"nyauth_backed/source/database"
@@ -118,6 +119,11 @@ func SendVerificationCode(c *gin.Context) {
 	case "register":
 		err := helper.SendVerificationCodeByEmail(creds.Useremail, "register")
 		if err != nil {
+			if errors.Is(err, helper.ErrVerificationCodeExists) {
+				// 验证码已存在并且未过期
+				SendResponse(c, http.StatusInternalServerError, "验证码还未到期呢~", nil)
+				return
+			}
 			logger.Error("Failed to send verification code: ", err)
 			SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
 			return
