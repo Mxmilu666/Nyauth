@@ -39,7 +39,7 @@ func UserLogin(c *gin.Context) {
 
 	userExists, user, err := database.GetUserByUsername(creds.Username)
 	if err != nil {
-		SendResponse(c, http.StatusInternalServerError, "检查用户存在时出错，数据库爆炸啦！", nil)
+		SendResponse(c, http.StatusInternalServerError, "不..不好..数据库坏掉了❤", nil)
 		return
 	}
 	if !userExists || user.UserPassword != creds.Password {
@@ -73,14 +73,15 @@ func UserRegister(c *gin.Context) {
 		return
 	}
 
-	if !helper.VerifyCode(creds.Useremail, creds.Code, "register") {
-		SendResponse(c, http.StatusBadRequest, "验证码错误", nil)
+	// 验证临时注册码
+	if !helper.VerifyTempCode(creds.Useremail, creds.TempCode, "register") {
+		SendResponse(c, http.StatusBadRequest, "验证已过期或无效，请重新验证邮箱", nil)
 		return
 	}
 
 	userExists, _, err := database.GetUserByUsername(creds.Username)
 	if err != nil {
-		SendResponse(c, http.StatusInternalServerError, "检查用户存在时出错，数据库爆炸啦！", nil)
+		SendResponse(c, http.StatusInternalServerError, "不..不好..数据库坏掉了❤", nil)
 		return
 	}
 	if userExists {
@@ -121,7 +122,7 @@ func SendVerificationCode(c *gin.Context) {
 		if err != nil {
 			if errors.Is(err, helper.ErrVerificationCodeExists) {
 				// 验证码已存在并且未过期
-				SendResponse(c, http.StatusInternalServerError, "验证码还未到期呢~", nil)
+				SendResponse(c, http.StatusInternalServerError, "不..不行..太快了❤ 请..请慢一点❤", nil)
 				return
 			}
 			logger.Error("Failed to send verification code: ", err)
@@ -172,4 +173,39 @@ func GetAccountStatus(c *gin.Context) {
 			"exists": false,
 		})
 	}
+}
+
+// 验证验证码并生成临时注册码
+func VerifyEmailCode(c *gin.Context) {
+	var creds models.VerifyCodeCredentials
+	if err := c.ShouldBindJSON(&creds); err != nil {
+		SendResponse(c, http.StatusBadRequest, "笨蛋！你..你放了什么东西进来❤", nil)
+		return
+	}
+
+	// 从查询参数中读取 usefor
+	usefor := c.Query("usefor")
+	if usefor == "" {
+		SendResponse(c, http.StatusBadRequest, "笨蛋！你..你放了什么东西进来❤", nil)
+		return
+	}
+
+	// 验证验证码
+	if !helper.VerifyCode(creds.Useremail, creds.Code, usefor) {
+		SendResponse(c, http.StatusBadRequest, "验证码错误或已过期", nil)
+		return
+	}
+
+	// 生成临时注册码，30分钟有效期
+	tempCode, err := helper.GenerateTempCode(creds.Useremail, usefor, 30)
+	if err != nil {
+		logger.Error("Failed to generate temporary code: ", err)
+		SendResponse(c, http.StatusInternalServerError, "不..不行❤里面坏掉了..❤", nil)
+		return
+	}
+
+	SendResponse(c, http.StatusOK, "success", gin.H{
+		"temp_code": tempCode,
+		"exp":       30 * 60,
+	})
 }

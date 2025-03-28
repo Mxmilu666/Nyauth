@@ -14,10 +14,19 @@ import (
 
 var ErrVerificationCodeExists = errors.New("verification code already exists and has not expired")
 
-// 验证码结构体，包含验证码和过期时间
+// 验证码结构体
 type VerificationCode struct {
 	Code      string
 	ExpiresAt time.Time
+	Email     string
+	UseFor    string
+}
+
+// 临时注册码结构体
+type TemporaryCode struct {
+	Code      string
+	ExpiresAt time.Time
+	Email     string
 	UseFor    string
 }
 
@@ -26,6 +35,12 @@ var codeCache = struct {
 	sync.RWMutex
 	m map[string]VerificationCode
 }{m: make(map[string]VerificationCode)}
+
+// 临时注册码缓存
+var tempCodeCache = struct {
+	sync.RWMutex
+	m map[string]TemporaryCode
+}{m: make(map[string]TemporaryCode)}
 
 type VerificationRequest struct {
 	Email string `json:"email"`
@@ -86,6 +101,7 @@ func SendVerificationCodeByEmail(to, usefor string) error {
 		Code:      code,
 		ExpiresAt: expiration,
 		UseFor:    usefor,
+		Email:     to,
 	}
 	codeCache.Unlock()
 
@@ -124,8 +140,17 @@ func VerifyCode(email, code, usefor string) bool {
 		return false
 	}
 
+	// 检查验证码是否是对应邮箱
+	if storedCode.Email != email {
+		return false
+	}
+
 	// 检查验证码是否已过期
 	if time.Now().After(storedCode.ExpiresAt) {
+		// 删除过期的临时码
+		tempCodeCache.Lock()
+		delete(tempCodeCache.m, email)
+		tempCodeCache.Unlock()
 		return false
 	}
 
@@ -139,6 +164,61 @@ func VerifyCode(email, code, usefor string) bool {
 		codeCache.Lock()
 		delete(codeCache.m, email)
 		codeCache.Unlock()
+		return true
+	}
+
+	return false
+}
+
+// GenerateTempCode 生成临时注册码并存储在缓存中
+func GenerateTempCode(email, usefor string, expirationMinutes int) (string, error) {
+	// 生成验证码
+	code := generateVerificationCode()
+
+	// 创建缓存键
+	key := fmt.Sprintf("%s:%s", email, usefor)
+
+	// 存储临时码
+	expiration := time.Now().Add(time.Duration(expirationMinutes) * time.Minute)
+	tempCodeCache.Lock()
+	tempCodeCache.m[key] = TemporaryCode{
+		Code:      code,
+		ExpiresAt: expiration,
+		Email:     email,
+		UseFor:    usefor,
+	}
+	tempCodeCache.Unlock()
+
+	return code, nil
+}
+
+// VerifyTempCode 验证临时注册码
+func VerifyTempCode(email, code, usefor string) bool {
+	key := fmt.Sprintf("%s:%s", email, usefor)
+
+	tempCodeCache.RLock()
+	storedCode, exists := tempCodeCache.m[key]
+	tempCodeCache.RUnlock()
+
+	if !exists {
+		return false
+	}
+
+	// 检查是否过期
+	if time.Now().After(storedCode.ExpiresAt) {
+		// 删除过期的临时码
+		tempCodeCache.Lock()
+		delete(tempCodeCache.m, key)
+		tempCodeCache.Unlock()
+		return false
+	}
+
+	// 验证码是否匹配
+	if storedCode.Code == code {
+		// 验证成功后删除
+		tempCodeCache.Lock()
+		delete(tempCodeCache.m, key)
+		tempCodeCache.Unlock()
 		return true
 	}
 

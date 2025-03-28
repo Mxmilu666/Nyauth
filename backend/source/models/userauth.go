@@ -15,6 +15,11 @@ type RegisterCredentials struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
 	Useremail string `json:"useremail"`
-	Code      string `json:"code"`
+	TempCode  string `json:"code"`
 	Secretkey string `json:"turnstile_secretkey"`
+}
+
+type VerifyCodeCredentials struct {
+	Useremail string `json:"useremail" binding:"required,email"`
+	Code      string `json:"code" binding:"required"`
 }
