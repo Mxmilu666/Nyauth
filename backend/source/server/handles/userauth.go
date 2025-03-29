@@ -89,16 +89,31 @@ func UserRegister(c *gin.Context) {
 		return
 	}
 
-	avatar := "https://cravatar.cn/avatar/" + untils.MD5(creds.Useremail) + "?d=identicon&s=256"
+	avatar := "https://cravatar.cn/avatar/" + untils.MD5(creds.Useremail) + "?s=256"
 
-	err = database.CreateUser(creds.Username, creds.Useremail, creds.Password, avatar)
+	userId, err := database.CreateUser(creds.Username, creds.Useremail, creds.Password, avatar)
 	if err != nil {
 		logger.Error("Failed to create user: ", err)
 		SendResponse(c, http.StatusInternalServerError, "创建用户时出错", nil)
 		return
 	}
 
-	SendResponse(c, http.StatusOK, "用户注册成功", nil)
+	// 生成 JWT token
+	exp := int64(60 * 60 * 24)
+	token, err := helper.JwtHelper.IssueToken(map[string]interface{}{
+		"user_name": creds.Username,
+		"user_id":   userId,
+		"role":      "user",
+	}, "user", exp)
+	if err != nil {
+		SendResponse(c, http.StatusInternalServerError, fmt.Sprintf("issue token err: %s", err.Error()), nil)
+		return
+	}
+
+	SendResponse(c, http.StatusOK, "注册成功", gin.H{
+		"token": token,
+		"exp":   exp,
+	})
 }
 
 func SendVerificationCode(c *gin.Context) {
@@ -122,7 +137,7 @@ func SendVerificationCode(c *gin.Context) {
 		if err != nil {
 			if errors.Is(err, helper.ErrVerificationCodeExists) {
 				// 验证码已存在并且未过期
-				SendResponse(c, http.StatusInternalServerError, "不..不行..太快了❤ 请..请慢一点❤", nil)
+				SendResponse(c, http.StatusTooManyRequests, "验证码还未过期呢，请等待一会再发送吧", nil)
 				return
 			}
 			logger.Error("Failed to send verification code: ", err)

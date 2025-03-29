@@ -22,3 +22,18 @@ export const accountLogin = (data: {
         }>
     >('/account/auth/login', data)
 }
+
+export const accountRegister = (data: {
+    username: string
+    useremail: string
+    password: string
+    code: string
+    turnstile_secretkey: string
+}) => {
+    return axios.post<
+        Response<{
+            token: string
+            exp: number
+        }>
+    >('/account/auth/register', data)
+}

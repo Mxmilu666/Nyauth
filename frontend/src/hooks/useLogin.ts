@@ -1,10 +1,10 @@
 import { ref, watch } from 'vue'
 import { VForm } from 'vuetify/lib/components/index.mjs'
-import { getAccountStatus, accountLogin } from '@/api/login'
+import { getAccountStatus, accountLogin, accountRegister } from '@/api/login'
 import { message } from '@/services/message'
 import { useRouter, useRoute } from 'vue-router'
 
-// 表单状态和验证相关钩子
+// 表单状态和验证管理
 export function useLoginForm() {
     const form = ref<InstanceType<typeof VForm>>()
     const email = ref('')
@@ -32,23 +32,17 @@ export function useLoginForm() {
     }
 }
 
-// 账户状态检查 Hook
+// 账户状态检查
 export function useAccountCheck() {
     const isLoading = ref(false)
 
     const checkAccount = async (email: string) => {
         isLoading.value = true
         try {
-            const { data } = await getAccountStatus({
-                username: email
-            })
-            // 确保 data 和 data.data 都存在
-            if (data && data.data !== undefined) {
-                return data.data.exists
-            }
-            return null
+            const { data } = await getAccountStatus({ username: email })
+            return data?.data?.exists ?? null
         } catch (error) {
-            console.error('API调用失败:', error)
+            console.error('账户检查失败:', error)
             return null
         } finally {
             isLoading.value = false
@@ -61,28 +55,28 @@ export function useAccountCheck() {
     }
 }
 
-// 认证流程管理 Hook
+// 认证流程状态管理
 export function useAuthFlow() {
     const istologin = ref(false)
     const istoregister = ref(false)
     const isOtpVerified = ref(false)
+    const tempCode = ref('')
 
     const setAuthMode = (exists: boolean | null) => {
         if (exists === true) {
-            // 账户存在，显示登录表单
+            // 账户存在，进入登录流程
             istologin.value = true
             istoregister.value = false
-            isOtpVerified.value = false
         } else if (exists === false) {
-            // 账户不存在，显示注册表单
+            // 账户不存在，进入注册流程
             istologin.value = false
             istoregister.value = true
-            isOtpVerified.value = false
         }
+        isOtpVerified.value = false
     }
 
-    const completeOtpVerification = () => {
-        // OTP 验证完成后，将状态设置为已验证，进入密码设置阶段
+    const completeOtpVerification = (temp_code: string) => {
+        tempCode.value = temp_code
         isOtpVerified.value = true
     }
 
@@ -90,12 +84,13 @@ export function useAuthFlow() {
         istologin,
         istoregister,
         isOtpVerified,
+        tempCode,
         setAuthMode,
         completeOtpVerification
     }
 }
 
-// 登录操作 Hook
+// 登录部分处理
 export function useLoginOperation() {
     const isLoading = ref(false)
     const router = useRouter()
@@ -105,7 +100,7 @@ export function useLoginOperation() {
         email: string,
         password: string,
         captchaToken: string
-    ): Promise<boolean> => {
+    ) => {
         isLoading.value = true
         try {
             const { data } = await accountLogin({
@@ -114,22 +109,21 @@ export function useLoginOperation() {
                 turnstile_secretkey: captchaToken
             })
 
-            if (data && data.data) {
-                // 登录成功，保存 token
+            if (data?.data) {
+                // 保存登录状态
                 localStorage.setItem('token', data.data.token)
                 localStorage.setItem('tokenExpiry', data.data.exp.toString())
                 message.info('登录成功')
-                if (route.query.redirect) {
-                    router.push(route.query.redirect as string)
-                } else {
-                    router.push('/console')
-                }
+
+                // 重定向处理
+                const redirectPath = (route.query.redirect as string) || '/console'
+                router.push(redirectPath)
                 return true
             } else {
                 message.info('登录失败，请重试')
                 return false
             }
-        } catch (error: any) {
+        } catch (error) {
             console.error('登录失败:', error)
             return false
         } finally {
@@ -143,48 +137,111 @@ export function useLoginOperation() {
     }
 }
 
+/**
+ * 注册操作处理
+ */
+export function useRegisterOperation() {
+    const isLoading = ref(false)
+    const router = useRouter()
+    const route = useRoute()
+
+    const performRegister = async (
+        username: string,
+        email: string,
+        password: string,
+        temp_code: string,
+        captchaToken: string
+    ) => {
+        isLoading.value = true
+        try {
+            const { data } = await accountRegister({
+                username,
+                useremail: email,
+                password,
+                code: temp_code,
+                turnstile_secretkey: captchaToken
+            })
+
+            if (data?.data) {
+                // 保存登录状态
+                localStorage.setItem('token', data.data.token)
+                localStorage.setItem('tokenExpiry', data.data.exp.toString())
+                message.info('注册成功')
+
+                // 重定向处理
+                const redirectPath = (route.query.redirect as string) || '/console'
+                router.push(redirectPath)
+                return true
+            }
+            return false
+        } catch (error: any) {
+            console.error('注册失败:', error)
+            const errorMessage = error.response?.data?.message || '注册失败，请稍后重试'
+            message.info(errorMessage)
+            return false
+        } finally {
+            isLoading.value = false
+        }
+    }
+
+    return {
+        isLoading,
+        performRegister
+    }
+}
+
+// 整合登录注册流程的主Hook
 export function useLogin() {
     const { form, email, password, otp, emailRules, validateForm } = useLoginForm()
     const { isLoading: isCheckingAccount, checkAccount } = useAccountCheck()
-    const { 
-        istologin, 
-        istoregister, 
-        isOtpVerified, 
-        setAuthMode, 
-        completeOtpVerification 
+    const {
+        istologin,
+        istoregister,
+        isOtpVerified,
+        tempCode,
+        setAuthMode,
+        completeOtpVerification
     } = useAuthFlow()
     const { isLoading: isLoggingIn, performLogin } = useLoginOperation()
+    const { isLoading: isRegistering, performRegister } = useRegisterOperation()
 
     // 合并loading状态
     const isLoading = ref(false)
 
-    const updateLoadingState = () => {
-        isLoading.value = isCheckingAccount.value || isLoggingIn.value
-    }
+    // 更新全局加载状态
+    watch([isCheckingAccount, isLoggingIn, isRegistering], () => {
+        isLoading.value =
+            isCheckingAccount.value || isLoggingIn.value || isRegistering.value
+    })
 
-    // 监听两个loading状态的变化
-    watch([isCheckingAccount, isLoggingIn], updateLoadingState)
-
-    const login = async (captchaToken: string): Promise<boolean | void> => {
+    // 处理登录/注册流程
+    const login = async (captchaToken: string) => {
+        // 判断账户是否存在
         if (!istoregister.value && !istologin.value) {
             const accountExists = await checkAccount(email.value)
             setAuthMode(accountExists)
             return
         }
 
+        // 表单验证
         const valid = await validateForm()
         if (!valid) return false
 
-        // 登录逻辑
+        // 登录处理
         if (istologin.value) {
             return await performLogin(email.value, password.value, captchaToken)
         }
 
-        // 注册逻辑
+        // 注册处理 验证码已验证后
         if (istoregister.value && isOtpVerified.value) {
-            // 注册逻辑待实现 - 这里应该调用注册API
-            // 暂时复用登录API
-            return await performLogin(email.value, password.value, captchaToken)
+            const username = email.value.split('@')[0]
+            return await performRegister(
+                username,
+                email.value,
+                password.value,
+                tempCode.value,
+                captchaToken
+            )
         }
     }
 

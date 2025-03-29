@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { defineOptions } from 'vue'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
@@ -8,6 +8,7 @@ import passwordSetForm from './PasswordSetForm.vue'
 import { useLogin } from '@/hooks/useLogin'
 import turnstile from '@/components/turnstile/Turnstile.vue'
 import { message } from '@/services/message'
+import { verifyCode, sendCode } from '@/api/util'
 
 defineOptions({
     name: 'AuthPage'
@@ -17,6 +18,8 @@ const showTurnstile = ref(false)
 const captchaToken = ref('')
 const otpVerifying = ref(false)
 const currentOtp = ref('')
+const sendingOtp = ref(false)
+const turnstilePurpose = ref<'login' | 'register' | 'sendOtp'>('login')
 
 const {
     istologin,
@@ -29,39 +32,85 @@ const {
     form,
     emailRules,
     login,
-    completeOtpVerification,
-    
+    completeOtpVerification
 } = useLogin()
 
-// 处理验证码验证
-const handleCaptchaVerify = (token: string) => {
+// 进入注册流程时发送OTP
+watch(istoregister, (isRegistering) => {
+    if (isRegistering && !isOtpVerified.value && !currentOtp.value) {
+        turnstilePurpose.value = 'sendOtp'
+        showTurnstile.value = true
+    }
+})
+
+// 验证码回调处理
+const handleCaptchaVerify = async (token: string) => {
     captchaToken.value = token
     showTurnstile.value = false
-    login(captchaToken.value)
+
+    switch (turnstilePurpose.value) {
+        case 'sendOtp':
+            sendUserOtp(token)
+            break
+        case 'login':
+        case 'register':
+            login(token)
+            break
+    }
+}
+
+// 发送OTP验证码
+const sendUserOtp = async (token: string) => {
+    if (!email.value) {
+        message.info('请输入有效的邮箱地址')
+        return
+    }
+
+    sendingOtp.value = true
+    try {
+        const { data } = await sendCode({
+            useremail: email.value,
+            turnstile_secretkey: token,
+            usefor: 'register'
+        })
+
+        if (data) {
+            message.info('验证码已发送至您的邮箱，请查收')
+        } else {
+            message.info('验证码发送失败，请重试')
+        }
+    } catch (error) {
+        console.error('发送OTP出错:', error)
+    } finally {
+        sendingOtp.value = false
+    }
 }
 
 const handleCaptchaError = (error: string) => {
     console.error('验证码错误:', error)
 }
 
-// 统一处理所有登录/注册流程
-const handleLogin = async () => {
-    // 邮箱输入阶段：检查账户状态并进入相应流程
+// 统一处理认证流程
+const handleAuthentication = async () => {
+    // 检查账户是否存在
     if (!istoregister.value && !istologin.value) {
+        turnstilePurpose.value = 'login'
         await login(captchaToken.value)
         return
     }
 
-    // 登录阶段：验证表单并请求登录
+    // 验证表单并请求登录
     if (istologin.value) {
         if (!form.value) return
         const { valid } = await form.value.validate()
         if (!valid) return
+
+        turnstilePurpose.value = 'login'
         showTurnstile.value = true
         return
     }
 
-    // 注册阶段（OTP验证）：验证OTP
+    // 验证验证码
     if (istoregister.value && !isOtpVerified.value) {
         if (!currentOtp.value || currentOtp.value.length < 6) {
             message.info('请输入完整的验证码')
@@ -70,14 +119,15 @@ const handleLogin = async () => {
 
         otpVerifying.value = true
         try {
-            // const verified = await verifyOtp(email.value, currentOtp.value)
-            const verified = true
-            if (verified) {
-                // OTP 验证成功，进入密码设置环节
-                completeOtpVerification()
-                message.info('验证码验证成功')
+            const { data } = await verifyCode({
+                useremail: email.value,
+                code: currentOtp.value,
+                usefor: 'register'
+            })
+
+            if (data?.data) {
+                completeOtpVerification(data.data.temp_code)
             } else {
-                // OTP 验证失败
                 message.info('验证码验证失败，请检查后重试')
             }
         } catch (error) {
@@ -89,22 +139,23 @@ const handleLogin = async () => {
         return
     }
 
-    // 注册阶段（密码设置）：验证表单并提交注册
+    // 提交注册
     if (istoregister.value && isOtpVerified.value) {
         if (!form.value) return
         const { valid } = await form.value.validate()
         if (!valid) return
+
+        turnstilePurpose.value = 'register'
         showTurnstile.value = true
         return
     }
 }
 
-// 从OTP组件接收验证码
+// 处理OTP输入
 const handleOtpInput = (otpCode: string) => {
     currentOtp.value = otpCode
-    // 如果已经输入了完整的6位验证码，可以自动触发验证
     if (otpCode.length === 6) {
-        handleLogin()
+        handleAuthentication()
     }
 }
 </script>
@@ -122,7 +173,10 @@ const handleOtpInput = (otpCode: string) => {
 
         <v-row align="center" justify="center">
             <v-col cols="12" sm="8" md="4">
-                <v-card :disabled="isLoading || otpVerifying" :loading="isLoading || otpVerifying">
+                <v-card
+                    :disabled="isLoading || otpVerifying"
+                    :loading="isLoading || otpVerifying"
+                >
                     <template v-slot:loader="{ isActive }">
                         <v-progress-linear
                             :active="isActive"
@@ -141,7 +195,9 @@ const handleOtpInput = (otpCode: string) => {
                             <p v-if="!istoregister" class="text-h5">
                                 登录到 <strong>Nyauth</strong>
                             </p>
-                            <p v-else-if="istoregister && !isOtpVerified" class="text-h5">注册到 <strong>Nyauth</strong></p>
+                            <p v-else-if="istoregister && !isOtpVerified" class="text-h5">
+                                注册到 <strong>Nyauth</strong>
+                            </p>
                             <p v-else class="text-h5">完成注册 <strong>Nyauth</strong></p>
                         </div>
                     </v-card-title>
@@ -155,7 +211,7 @@ const handleOtpInput = (otpCode: string) => {
                                 prepend-inner-icon="mdi-email-outline"
                                 variant="outlined"
                                 :rules="emailRules"
-                                @keyup.enter="handleLogin"
+                                @keyup.enter="handleAuthentication"
                                 required
                             />
                             <v-slide-y-transition :leave-absolute="true">
@@ -164,13 +220,13 @@ const handleOtpInput = (otpCode: string) => {
                                     v-if="istoregister && !isOtpVerified"
                                     :email="email"
                                     :otp="otp"
-                                    :loading="otpVerifying"
+                                    :loading="otpVerifying || sendingOtp"
                                     @otpEnter="handleOtpInput"
                                 />
                                 <passwordSetForm
                                     v-if="istoregister && isOtpVerified"
                                     v-model:password="password"
-                                    @enter="handleLogin"
+                                    @enter="handleAuthentication"
                                 />
                             </v-slide-y-transition>
                         </v-form>
@@ -183,13 +239,16 @@ const handleOtpInput = (otpCode: string) => {
                             append-icon="mdi-chevron-right"
                             color="primary"
                             variant="flat"
-                            @click="handleLogin"
+                            @click="handleAuthentication"
                             :loading="otpVerifying"
                             :disabled="otpVerifying"
                         >
-                            {{ 
-                                istoregister && !isOtpVerified ? '验证' : 
-                                istoregister && isOtpVerified ? '注册' : '继续' 
+                            {{
+                                istoregister && !isOtpVerified
+                                    ? '验证'
+                                    : istoregister && isOtpVerified
+                                      ? '注册'
+                                      : '继续'
                             }}
                         </v-btn>
                         <div class="d-flex justify-space-between w-100 mt-1">

@@ -78,15 +78,16 @@ func GetUserByUsername(username string) (bool, *models.DatabaseUser, error) {
 }
 
 // CreateUser 注册新用户
-func CreateUser(username, email, password, avatar string) error {
+func CreateUser(username, email, password, avatar string) (string, error) {
 	collection := client.Database(DatabaseName).Collection(UserCollection)
 
 	objectId := bson.NewObjectID()
+	userUUID := untils.ToUUIDv5(objectId.Hex())
 
 	// 创建新用户对象
 	user := &models.DatabaseUser{
 		UserID:       objectId,
-		UserUUID:     untils.ToUUIDv5(objectId.Hex()),
+		UserUUID:     userUUID,
 		Username:     username,
 		UserEmail:    email,
 		UserPassword: password,
@@ -101,10 +102,10 @@ func CreateUser(username, email, password, avatar string) error {
 	// 插入用户到数据库
 	_, err := collection.InsertOne(context.TODO(), user)
 	if err != nil {
-		return err
+		return "", err
 	}
 
-	return nil
+	return objectId.Hex(), nil
 }
 
 // GetUserByID 通过用户ID获取用户信息
