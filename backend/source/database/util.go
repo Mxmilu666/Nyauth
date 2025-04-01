@@ -157,3 +157,20 @@ func UpdateUser(userID string, updates map[string]interface{}) error {
 
 	return nil
 }
+
+// GetClientByClientID 通过ClientID获取客户端信息
+func GetClientByClientID(clientID string) (*models.DatabaseClient, error) {
+	collection := client.Database(DatabaseName).Collection(ClientCollection)
+
+	// 查找一个匹配的文档
+	var dbClient models.DatabaseClient
+	err := collection.FindOne(context.TODO(), bson.M{"client_id": clientID}).Decode(&dbClient)
+	if err != nil {
+		if err == mongo.ErrNoDocuments {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	return &dbClient, nil
+}
