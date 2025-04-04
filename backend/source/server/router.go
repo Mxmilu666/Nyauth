@@ -51,6 +51,7 @@ func initRouter(r *gin.Engine) *gin.Engine {
 		oauth := api.Group("/oauth", handles.JWTMiddleware("user"))
 		{
 			oauth.POST("/authorize", handles.OAuthAuthorize)
+			oauth.POST("/getclientinfo", handles.GetClientinfo)
 		}
 	}
 	return r

@@ -17,6 +17,7 @@ import (
 var DatabaseName = "nyauth"
 var UserCollection = "users"
 var ClientCollection = "clients"
+var AuthorizationCollection = "authorization"
 
 // 保存数据库连接
 var client *mongo.Client
@@ -47,6 +48,12 @@ func InitDatabase() error {
 
 	// 初始化 Client 集合
 	err = EnsureCollection(client, DatabaseName, ClientCollection)
+	if err != nil {
+		return err
+	}
+
+	// 初始化 Authorization 集合
+	err = EnsureCollection(client, DatabaseName, AuthorizationCollection)
 	if err != nil {
 		return err
 	}
@@ -169,9 +176,15 @@ func UpdateUser(userID string, updates map[string]interface{}) error {
 func GetClientByClientID(clientID string) (*models.DatabaseClient, error) {
 	collection := client.Database(DatabaseName).Collection(ClientCollection)
 
+	// 将字符串类型的 userID 转换为 ObjectID
+	objID, err := bson.ObjectIDFromHex(clientID)
+	if err != nil {
+		return nil, err
+	}
+
 	// 查找一个匹配的文档
 	var dbClient models.DatabaseClient
-	err := collection.FindOne(context.TODO(), bson.M{"client_id": clientID}).Decode(&dbClient)
+	err = collection.FindOne(context.TODO(), bson.M{"_id": objID}).Decode(&dbClient)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
 			return nil, nil
