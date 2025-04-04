@@ -11,6 +11,7 @@ type DatabaseUser struct {
 	UserEmail    string        `bson:"user_email"`
 	Avatar       string        `bson:"avatar"`
 	RegisterAt   bson.DateTime `bson:"register_at"`
+	UpdatedAt    bson.DateTime `bson:"updated_at"`
 	IsBanned     bool          `bson:"is_banned"`
 	Role         string        `bson:"role"`
 }

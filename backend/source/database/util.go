@@ -83,6 +83,7 @@ func CreateUser(username, email, password, avatar string) (string, error) {
 
 	objectId := bson.NewObjectID()
 	userUUID := untils.ToUUIDv5(objectId.Hex())
+	Time := bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond))
 
 	// 创建新用户对象
 	user := &models.DatabaseUser{
@@ -92,9 +93,9 @@ func CreateUser(username, email, password, avatar string) (string, error) {
 		UserEmail:    email,
 		UserPassword: password,
 		Avatar:       avatar,
-
 		// 注册时间
-		RegisterAt: bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
+		RegisterAt: Time,
+		UpdatedAt:  Time,
 		IsBanned:   false,
 		Role:       "0",
 	}
@@ -140,6 +141,12 @@ func UpdateUser(userID string, updates map[string]interface{}) error {
 	if err != nil {
 		return fmt.Errorf("invalid user ID: %w", err)
 	}
+
+	// 添加更新时间
+	if updates == nil {
+		updates = make(map[string]interface{})
+	}
+	updates["updated_at"] = bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond))
 
 	// 创建更新文档
 	update := bson.M{"$set": updates}
