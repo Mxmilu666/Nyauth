@@ -47,10 +47,17 @@ const router = createRouter({
                 }
             ]
         },
+        // oauth
         {
-            path: '/authorize',
-            name: 'Authorize',
-            component: () => import('@/pages/Authorize/Authorize.vue')
+            path: '/oauth',
+            name: 'Oauth',
+            children: [
+                {
+                    path: 'authorize',
+                    name: 'Authorize',
+                    component: () => import('@/pages/Authorize/Authorize.vue')
+                }
+            ]
         }
     ]
 })

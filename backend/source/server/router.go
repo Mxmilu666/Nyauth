@@ -2,15 +2,37 @@ package server
 
 import (
 	"net/http"
+	"net/http/httputil"
+	"net/url"
 	"nyauth_backed/source/server/handles"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
 
 func initRouter(r *gin.Engine) *gin.Engine {
-	r.GET("/", func(c *gin.Context) {
-		c.Redirect(http.StatusFound, "https://ys.mihoyo.com")
+
+	target, _ := url.Parse("http://localhost:5173")
+	proxy := httputil.NewSingleHostReverseProxy(target)
+
+	// 设置反向代理中间件 - 对除了 /api/v0 外的所有路由
+	r.Use(func(c *gin.Context) {
+		if strings.HasPrefix(c.Request.URL.Path, "/api/v0") || strings.HasPrefix(c.Request.URL.Path, "/.well-known") {
+			c.Next()
+			return
+		}
+
+		// 其他所有路由反向代理到 localhost:5173
+		proxy.ServeHTTP(c.Writer, c.Request)
+		c.Abort() // 阻止后续处理
 	})
+
+	///r.GET("/", func(c *gin.Context) {
+	///	c.Redirect(http.StatusFound, "https://ys.mihoyo.com")
+	///})
+
+	r.GET("/.well-known/openid-configuration", handles.GetOpenIDConfiguration)
+	r.GET("/.well-known/jwks.json", handles.GetJWKS)
 
 	api := r.Group("/api/v0")
 	{
@@ -48,10 +70,15 @@ func initRouter(r *gin.Engine) *gin.Engine {
 			}
 		}
 
-		oauth := api.Group("/oauth", handles.JWTMiddleware("user"))
+		oauth := api.Group("/oauth")
 		{
-			oauth.POST("/authorize", handles.OAuthAuthorize)
-			oauth.POST("/getclientinfo", handles.GetClientinfo)
+			oauthProtected := oauth.Group("", handles.JWTMiddleware("user"))
+			{
+				oauthProtected.GET("/authorize", handles.OAuthAuthorize)
+				oauthProtected.POST("/getclientinfo", handles.GetClientinfo)
+			}
+
+			oauth.POST("/token", handles.OAuthToken)
 		}
 	}
 	return r

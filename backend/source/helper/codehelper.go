@@ -46,6 +46,55 @@ type VerificationRequest struct {
 	Email string `json:"email"`
 }
 
+func init() {
+	// 启动定期清理过期验证码
+	go cleanupExpiredCodes()
+}
+
+// cleanupExpiredCodes 定期清理过期的验证码和临时码
+func cleanupExpiredCodes() {
+	ticker := time.NewTicker(5 * time.Minute) // 每5分钟清理一次
+	defer ticker.Stop()
+
+	for range ticker.C {
+		// 清理过期的验证码
+		removeExpiredVerificationCodes()
+
+		// 清理过期的临时注册码
+		removeExpiredTemporaryCodes()
+	}
+}
+
+// removeExpiredVerificationCodes 清理过期的验证码
+func removeExpiredVerificationCodes() {
+	now := time.Now()
+
+	codeCache.Lock()
+	defer codeCache.Unlock()
+
+	// 遍历所有验证码，删除已过期的
+	for email, code := range codeCache.m {
+		if now.After(code.ExpiresAt) {
+			delete(codeCache.m, email)
+		}
+	}
+}
+
+// removeExpiredTemporaryCodes 清理过期的临时注册码
+func removeExpiredTemporaryCodes() {
+	now := time.Now()
+
+	tempCodeCache.Lock()
+	defer tempCodeCache.Unlock()
+
+	// 遍历所有临时注册码，删除已过期的
+	for key, code := range tempCodeCache.m {
+		if now.After(code.ExpiresAt) {
+			delete(tempCodeCache.m, key)
+		}
+	}
+}
+
 func SendEmail(to, subject, body string) error {
 	// 从配置中读取 SMTP 相关信息
 	username := source.AppConfig.SMTP.Username

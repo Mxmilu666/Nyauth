@@ -35,7 +35,7 @@ type DatabaseUserAuthorization struct {
 	ID          bson.ObjectID `bson:"_id"`
 	UserID      string        `bson:"user_id"`      // 授权用户的UUID
 	ClientID    string        `bson:"client_id"`    // 被授权的客户端ID
-	Scope       []string      `bson:"scope"`        // 授权范围
+	Scope       string        `bson:"scope"`        // 授权范围
 	AccessToken string        `bson:"access_token"` // 访问令牌
 	TokenType   string        `bson:"token_type"`   // 令牌类型
 	ExpiresAt   bson.DateTime `bson:"expires_at"`   // 令牌过期时间

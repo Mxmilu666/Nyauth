@@ -7,6 +7,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"io/ioutil"
+	"nyauth_backed/source"
 	"os"
 	"time"
 
@@ -183,4 +184,42 @@ func parsePublicKey(data []byte) (*rsa.PublicKey, error) {
 func fileExists(filePath string) bool {
 	_, err := os.Stat(filePath)
 	return err == nil
+}
+
+// IssueOIDCToken 生成 OpenID Connect ID Token
+func (j *JwtHelperCert) IssueOIDCToken(
+	subject string, // 用户唯一标识
+	audience string, // 客户端ID
+	nonce string, // 防止重放攻击的随机字符串(可选)
+	expiresInSeconds int64, // 过期时间（秒）
+) (string, error) {
+	now := time.Now()
+	exp := now.Add(time.Duration(expiresInSeconds) * time.Second)
+
+	// 创建标准 OIDC 声明
+	claims := jwt.MapClaims{
+		"iss":       source.AppConfig.Server.BaseURL,
+		"sub":       subject,    // 用户唯一标识
+		"aud":       audience,   // 客户端ID
+		"iat":       now.Unix(), // 签发时间
+		"exp":       exp.Unix(), // 过期时间
+		"auth_time": now.Unix(), // 认证时间，默认使用当前时间
+	}
+
+	// 添加可选的nonce声明
+	if nonce != "" {
+		claims["nonce"] = nonce
+	}
+
+	token := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
+
+	// 设置JWT头部
+	token.Header["typ"] = "JWT"
+
+	return token.SignedString(j.privateKey)
+}
+
+// GetPublicKey 返回用于验证的公钥
+func (j *JwtHelperCert) GetPublicKey() *rsa.PublicKey {
+	return j.publicKey
 }

@@ -12,8 +12,9 @@ import (
 
 // ServerConfig 结构体定义服务器配置项
 type ServerConfig struct {
-	Host string `yaml:"host"`
-	Port int    `yaml:"port"`
+	Host    string `yaml:"host"`
+	Port    int    `yaml:"port"`
+	BaseURL string `yaml:"base_url"`
 }
 
 // DatabaseConfig 结构体定义数据库配置项
@@ -52,8 +53,9 @@ var AppConfig *Config
 func defaultConfig() *Config {
 	return &Config{
 		Server: ServerConfig{
-			Host: "0.0.0.0",
-			Port: 8080,
+			Host:    "0.0.0.0",
+			Port:    8080,
+			BaseURL: "http://localhost:8080",
 		},
 		Database: DatabaseConfig{
 			Host:     "localhost",
