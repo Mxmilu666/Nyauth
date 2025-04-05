@@ -3,23 +3,36 @@ import { useMountComponent } from '@/hooks/useMountComponent'
 import MessageComponent from './Message.vue'
 import ModalComponent from './Modal.vue'
 
+// 定义按钮类型接口
+export interface ModalButton {
+    text: string;
+    color?: string;
+    variant?: string;
+    value: any;
+}
+
 // 基础函数
 export const useMessageDialog = async (message: string) => {
     return await useMountComponent({ message }).mount(MessageComponent)
 }
 
-export const useModal = async (
+export const useModal = async <T = boolean>(
     title: string,
     content: string,
-    confirmButtonText?: string,
-    cancelButtonText?: string
-): Promise<boolean> => {
+    options?: {
+        buttons?: ModalButton[];
+        prependIcon?: string;
+    }
+): Promise<T> => {
     const result = await useMountComponent({
         title,
         content,
-        confirmButtonText,
-        cancelButtonText
-    }).mount<boolean>(ModalComponent)
+        prependIcon: options?.prependIcon || 'mdi-update',
+        buttons: options?.buttons || [
+            { text: '取消', color: 'error', variant: 'text', value: false },
+            { text: '确认', color: 'primary', variant: 'text', value: true }
+        ]
+    }).mount<T>(ModalComponent)
 
-    return result === true
+    return result as T
 }

@@ -1,32 +1,63 @@
 import { useModal } from '@/components/service/index'
+import type { ModalButton } from '@/components/service/index'
 
 export const modal = {
-    show(options: {
+    show<T = boolean>(options: {
         title: string
         content: string
-        confirmButtonText?: string
-        cancelButtonText?: string
-    }): Promise<boolean> {
-        return useModal(
+        buttons?: ModalButton[]
+        prependIcon?: string
+    }): Promise<T> {
+        return useModal<T>(
             options.title,
             options.content,
-            options.confirmButtonText,
-            options.cancelButtonText
+            {
+                buttons: options.buttons,
+                prependIcon: options.prependIcon
+            }
         )
     },
 
-    error(options: { title?: string; content: string }): Promise<boolean> {
+    error<T = boolean>(options: { 
+        title?: string; 
+        content: string;
+        buttons?: ModalButton[];
+        prependIcon?: string
+    }): Promise<T> {
         const { title = '错误', content } = options
-        return useModal(title, content, '确定', '取消')
+        return useModal<T>(title, content, {
+            buttons: options.buttons || [
+                { text: '确定', color: 'primary', variant: 'text', value: true }
+            ],
+            prependIcon: options.prependIcon || 'mdi-close-circle'
+        })
     },
 
-    success(options: { title?: string; content: string }): Promise<boolean> {
+    success<T = boolean>(options: { 
+        title?: string; 
+        content: string;
+        buttons?: ModalButton[];
+        prependIcon?: string
+    }): Promise<T> {
         const { title = '成功', content } = options
-        return useModal(title, content, '确定', '取消')
+        return useModal<T>(title, content, {
+            buttons: options.buttons || [
+                { text: '确定', color: 'success', variant: 'text', value: true }
+            ],
+            prependIcon: options.prependIcon || 'mdi-check-circle'
+        })
     },
 
-    confirm(options: { title?: string; content: string }): Promise<boolean> {
+    confirm<T = boolean>(options: { 
+        title?: string; 
+        content: string;
+        buttons?: ModalButton[];
+        prependIcon?: string
+    }): Promise<T> {
         const { title = '确认', content } = options
-        return useModal(title, content)
+        return useModal<T>(title, content, {
+            buttons: options.buttons,
+            prependIcon: options.prependIcon || 'mdi-help-circle'
+        })
     }
 }

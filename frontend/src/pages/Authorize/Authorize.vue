@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { defineOptions, onMounted } from 'vue'
+import { defineOptions, onMounted, ref } from 'vue'
 import { useOAuthAuthorize } from '@/hooks/useAuthorize'
 import AppInfo from './AppInfo.vue'
 import PermissionList from './PermissionList.vue'
@@ -36,21 +36,15 @@ onMounted(async () => {
         fluid
     >
         <v-card max-width="900" class="mx-auto" elevation="3">
-            <!-- 显示加载或错误状态 -->
-            <div v-if="loading" class="pa-6 text-center">
-                <v-progress-circular indeterminate color="primary" />
-                <p class="mt-4">正在加载应用信息...</p>
-            </div>
-
-            <div v-else-if="error" class="pa-6 text-center">
-                <v-alert type="error" title="出错了">
-                    {{ error }}
-                </v-alert>
-                <v-btn class="mt-4" color="primary" to="/"> 返回首页 </v-btn>
-            </div>
+            <v-progress-linear
+                v-if="loading"
+                color="primary"
+                height="4"
+                indeterminate
+            ></v-progress-linear>
 
             <!-- 授权成功状态 -->
-            <div v-else-if="authSuccess" class="pa-6 text-center">
+            <div v-if="authSuccess" class="pa-6 text-center">
                 <v-icon size="64" color="success" class="mb-3">mdi-check-circle</v-icon>
                 <p class="text-h6 mb-2">授权已完成，正在跳转回应用...</p>
             </div>

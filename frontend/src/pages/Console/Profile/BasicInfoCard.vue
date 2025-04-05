@@ -14,11 +14,18 @@ interface Props {
 }
 const props = defineProps<Props>()
 
-const changeAvatar = () => {
-    modal.show({
+const changeAvatar = async () => {
+    const choice = await modal.show<string>({
         title: '请前往 Cravatar 更换头像',
-        content: 'Nyauth 使用 Cravatar 作为头像提供商，您可前往 Cravatar 更换头像'
+        content: 'Nyauth 使用 Cravatar 作为头像提供商，您可前往 Cravatar 更换头像',
+        buttons: [
+            { text: '取消', color: 'error', variant: 'text', value: 'cancel' },
+            { text: '前往 Cravatar', color: 'primary', variant: 'text', value: 'go' }
+        ]
     })
+    if (choice === 'go') {
+        window.open('https://cravatar.cn', '_blank')
+    }
 }
 </script>
 

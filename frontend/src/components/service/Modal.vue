@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
+import type { ModalButton } from './index'
 
 defineOptions({
     name: 'ModalComponent'
@@ -8,40 +9,43 @@ defineOptions({
 const props = defineProps<{
     title: string
     content: string
-    confirmButtonText?: string
-    cancelButtonText?: string
-    emitResult: (result: boolean) => void
+    prependIcon: string
+    buttons: ModalButton[]
+    emitResult: (result: any) => void
     destroyComponent: () => void
 }>()
 
 const dialog = ref<boolean>(true)
 
-const handleConfirm = () => {
+const handleButtonClick = (value: any) => {
     dialog.value = false
-    props.emitResult(true)
-    props.destroyComponent()
-}
-
-const handleCancel = () => {
-    dialog.value = false
-    props.emitResult(false)
+    props.emitResult(value)
     props.destroyComponent()
 }
 </script>
 
 <template>
-    <v-dialog v-model="dialog" max-width="500px" persistent>
-        <v-card>
-            <v-card-title>{{ title }}</v-card-title>
-            <v-card-text>{{ content }}</v-card-text>
-            <v-card-actions>
-                <v-btn color="error" variant="text" @click="handleCancel">
-                    {{ cancelButtonText || '取消' }}
+    <v-dialog v-model="dialog" max-width="500" persistent>
+        <v-card max-width="500" :prepend-icon="prependIcon" :text="content" :title="title">
+            <template v-slot:actions>
+                <v-btn
+                    v-for="(button, index) in buttons"
+                    :key="index"
+                    :color="button.color || 'default'"
+                    :variant="
+                        (button.variant as
+                            | 'flat'
+                            | 'text'
+                            | 'elevated'
+                            | 'tonal'
+                            | 'outlined'
+                            | 'plain') || 'text'
+                    "
+                    @click="handleButtonClick(button.value)"
+                >
+                    {{ button.text }}
                 </v-btn>
-                <v-btn color="primary" variant="text" @click="handleConfirm">
-                    {{ confirmButtonText || '确认' }}
-                </v-btn>
-            </v-card-actions>
+            </template>
         </v-card>
     </v-dialog>
 </template>

@@ -1,6 +1,8 @@
 import { ref, computed } from 'vue'
 import { getClientInfo, getOAuthAuthorize, type OAuthAuthorizeParams } from '@/api/oauth'
 import { useRoute } from 'vue-router'
+import { modal } from '@/services/modal'
+import router from '@/router'
 
 export interface Identity {
     id: number
@@ -130,8 +132,21 @@ export function useOAuthAuthorize() {
 
             // 验证必要参数是否存在
             if (!oauthParams.value.client_id) {
-                error.value = '缺少client_id参数'
-                loading.value = false
+                const choice = await modal.error<string>({
+                    title: '笨蛋！',
+                    content: '你还没有填写 client_id 参数呢！',
+                    buttons: [
+                        {
+                            text: '回到主页',
+                            color: 'primary',
+                            variant: 'text',
+                            value: 'back'
+                        }
+                    ]
+                })
+                if (choice === 'back') {
+                    router.push({ name: 'Home' })
+                }
                 return
             }
 
@@ -159,16 +174,22 @@ export function useOAuthAuthorize() {
                     // 如果映射表中没有，则使用默认解析逻辑
                     const permParts = perm.split(':')
                     return {
-                        title: `获取${permParts[0]}`,
+                        title: `获取${permParts[1]}`,
                         description: `允许应用${permParts[1] === 'read' ? '读取' : '修改'}您的${permParts[0]}`
                     }
                 })
             } else {
-                error.value = clientResponse.msg || '获取应用信息失败'
+                modal.error({
+                    title: '出错惹',
+                    content: clientResponse.msg || '获取应用信息失败'
+                })
             }
         } catch (err) {
             console.error('获取应用信息失败:', err)
-            error.value = '获取应用信息失败，请稍后再试'
+            modal.error({
+                title: '出错惹',
+                content: '获取应用信息失败 qnq'
+            })
         } finally {
             loading.value = false
         }
