@@ -3,11 +3,11 @@ package helper
 import (
 	"errors"
 	"fmt"
-	"math/rand"
 	"sync"
 	"time"
 
 	"nyauth_backed/source"
+	"nyauth_backed/source/untils"
 
 	"gopkg.in/gomail.v2"
 )
@@ -46,16 +46,6 @@ type VerificationRequest struct {
 	Email string `json:"email"`
 }
 
-func generateVerificationCode() string {
-	rand.Seed(time.Now().UnixNano())
-	const letters = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	b := make([]byte, 6)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
-}
-
 func SendEmail(to, subject, body string) error {
 	// 从配置中读取 SMTP 相关信息
 	username := source.AppConfig.SMTP.Username
@@ -89,7 +79,10 @@ func SendVerificationCodeByEmail(to, usefor string) error {
 	}
 
 	// 生成验证码
-	code := generateVerificationCode()
+	code, err := untils.GenerateRandomCode(6, true)
+	if err != nil {
+		return fmt.Errorf("failed to generate verification code: %w", err)
+	}
 
 	// 验证码有效期为10分钟
 	expirationMinutes := 10
@@ -173,7 +166,10 @@ func VerifyCode(email, code, usefor string) bool {
 // GenerateTempCode 生成临时注册码并存储在缓存中
 func GenerateTempCode(email, usefor string, expirationMinutes int) (string, error) {
 	// 生成验证码
-	code := generateVerificationCode()
+	code, err := untils.GenerateRandomCode(6, true)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate verification code: %w", err)
+	}
 
 	// 创建缓存键
 	key := fmt.Sprintf("%s:%s", email, usefor)

@@ -194,3 +194,31 @@ func GetClientByClientID(clientID string) (*models.DatabaseClient, error) {
 
 	return &dbClient, nil
 }
+
+// CreateAuthorizationCode 创建新的授权码
+func CreateAuthorizationCode(userID, clientID string, scope []string) (string, error) {
+	// 生成一个32位的随机授权码
+	token, err := untils.GenerateRandomCode(32, false)
+	if err != nil {
+		return "", fmt.Errorf("failed to generate authorization code: %v", err)
+	}
+
+	// 创建授权码记录
+	authCode := models.DatabaseUserAuthorization{
+		ID:          bson.NewObjectID(),
+		AccessToken: token,
+		ClientID:    clientID,
+		UserID:      userID,
+		Scope:       scope,
+		ExpiresAt:   bson.NewDateTimeFromTime(time.Now().Add(10 * time.Minute)), // 授权码10分钟有效
+		CreatedAt:   bson.NewDateTimeFromTime(time.Now()),
+	}
+
+	// 将授权码记录插入数据库
+	_, err = client.Database(DatabaseName).Collection(AuthorizationCollection).InsertOne(context.Background(), authCode)
+	if err != nil {
+		return "", fmt.Errorf("failed to save authorization code: %v", err)
+	}
+
+	return token, nil
+}
