@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { defineOptions, ref } from 'vue'
-import { useIdentities } from '@/hooks/useAuthorize'
+import { defineOptions, onMounted } from 'vue'
+import { useOAuthAuthorize } from '@/hooks/useAuthorize'
 import AppInfo from './AppInfo.vue'
 import PermissionList from './PermissionList.vue'
 import IdentitySelector from './IdentitySelector.vue'
@@ -9,36 +9,25 @@ defineOptions({
     name: 'AuthPage'
 })
 
-const { identities, selectedIdentityId, selectedIdentity } = useIdentities()
+const {
+    appInfo,
+    permissions,
+    loading,
+    error,
+    identities,
+    selectedIdentityId,
+    selectedIdentity,
+    initOAuthFlow,
+    handleAuthorize,
+    handleReject,
+    authSuccess,
+    redirectUrl
+} = useOAuthAuthorize()
 
-const appInfo = {
-    appName: 'BList',
-    appCreator: 'Baka',
-    appIcon: 'https://placehold.co/100',
-    appDescription: '这是应用描述喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵喵'
-}
-
-// 权限列表
-const permissions = [
-    {
-        title: '获取基础信息',
-        description: '读取您的基本信息（uid、用户状态、昵称、头像）'
-    },
-    {
-        title: '获取电子邮箱',
-        description: '获取您的电子邮箱地址'
-    }
-]
-
-// 处理授权操作
-const handleAuthorize = () => {
-    console.log(`已授权，使用ID: ${selectedIdentityId.value}`)
-}
-
-// 处理拒绝操作
-const handleReject = () => {
-    console.log('已拒绝')
-}
+// 从URL获取参数并请求数据
+onMounted(async () => {
+    await initOAuthFlow()
+})
 </script>
 
 <template>
@@ -47,7 +36,26 @@ const handleReject = () => {
         fluid
     >
         <v-card max-width="900" class="mx-auto" elevation="3">
-            <v-row no-gutters>
+            <!-- 显示加载或错误状态 -->
+            <div v-if="loading" class="pa-6 text-center">
+                <v-progress-circular indeterminate color="primary" />
+                <p class="mt-4">正在加载应用信息...</p>
+            </div>
+
+            <div v-else-if="error" class="pa-6 text-center">
+                <v-alert type="error" title="出错了">
+                    {{ error }}
+                </v-alert>
+                <v-btn class="mt-4" color="primary" to="/"> 返回首页 </v-btn>
+            </div>
+
+            <!-- 授权成功状态 -->
+            <div v-else-if="authSuccess" class="pa-6 text-center">
+                <v-icon size="64" color="success" class="mb-3">mdi-check-circle</v-icon>
+                <p class="text-h6 mb-2">授权已完成，正在跳转回应用...</p>
+            </div>
+
+            <v-row v-else no-gutters>
                 <v-col cols="12" sm="4" class="app-info bg-primary">
                     <AppInfo v-bind="appInfo" />
                 </v-col>

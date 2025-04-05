@@ -64,8 +64,8 @@ const router = createRouter({
 
 // 全局前置守卫
 router.beforeEach((to, from, next) => {
-    // 检查 path 是否为 /console 或者 /authorize
-    if (to.path.startsWith('/console') || to.path.startsWith('/authorize')) {
+    // 检查 path 是否为 /console 或者 /oauth
+    if (to.path.startsWith('/console') || to.path.startsWith('/oauth')) {
         // 验证是否存在 token
         const token = Cookie.get('token')
         if (!token) {

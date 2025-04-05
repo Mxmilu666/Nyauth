@@ -7,6 +7,7 @@ import (
 	"nyauth_backed/source/helper"
 	"nyauth_backed/source/models"
 	"nyauth_backed/source/oauth"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -53,9 +54,9 @@ func OAuthAuthorize(c *gin.Context) {
 		return
 	}
 
-	// 验证权限范围
-	if !oauth.ValidateScope(client.Permissions, scope) {
-		SendResponse(c, http.StatusBadRequest, "请求的权限范围超出应用允许的范围", nil)
+	// 检查scope中是否包含openid
+	if scope == "" || !strings.Contains(scope, "openid") {
+		SendResponse(c, http.StatusBadRequest, "缺少必要的 openid 权限范围", nil)
 		return
 	}
 
@@ -77,7 +78,15 @@ func OAuthAuthorize(c *gin.Context) {
 	}
 
 	// 构建重定向URL
-	redirectURL := fmt.Sprintf("%s?code=%s", redirectURI, authCode)
+	var redirectURL string
+	if strings.Contains(redirectURI, "?") {
+		// 如果重定向URI已经包含查询参数，使用&连接
+		redirectURL = fmt.Sprintf("%s&code=%s", redirectURI, authCode)
+	} else {
+		// 否则使用?开始查询参数
+		redirectURL = fmt.Sprintf("%s?code=%s", redirectURI, authCode)
+	}
+
 	if state != "" {
 		redirectURL = fmt.Sprintf("%s&state=%s", redirectURL, state)
 	}
@@ -128,10 +137,12 @@ func GetClientinfo(c *gin.Context) {
 	clientInfo := gin.H{
 		"client_id":   client.ID.Hex(),
 		"client_name": client.ClientName,
+		"description": client.Description,
 		"created_by":  creator.Username,
 		"avatar":      client.Avatar,
 		"status":      client.Status,
 		"created_at":  client.CreatedAt,
+		"permissions": client.Permissions,
 	}
 
 	SendResponse(c, http.StatusOK, "获取应用信息成功", clientInfo)
