@@ -3,6 +3,7 @@ import { VForm } from 'vuetify/lib/components/index.mjs'
 import { getAccountStatus, accountLogin, accountRegister } from '@/api/login'
 import { message } from '@/services/message'
 import { useRouter, useRoute } from 'vue-router'
+import { Cookie } from '@/utils/cookie'
 
 // 表单状态和验证管理
 export function useLoginForm() {
@@ -99,7 +100,8 @@ export function useLoginOperation() {
     const performLogin = async (
         email: string,
         password: string,
-        captchaToken: string
+        captchaToken: string,
+        rememberMe: boolean = true
     ) => {
         isLoading.value = true
         try {
@@ -110,9 +112,18 @@ export function useLoginOperation() {
             })
 
             if (data?.data) {
-                // 保存登录状态
-                localStorage.setItem('token', data.data.token)
-                localStorage.setItem('tokenExpiry', data.data.exp.toString())
+                // 保存登录状态到cookie
+                const expirationDays = rememberMe ? 30 : 1; // 保持登录30天，否则1天
+                Cookie.set('token', data.data.token, expirationDays);
+                Cookie.set('tokenExpiry', data.data.exp.toString(), expirationDays);
+                
+                // 如果选择了保持登录，存储额外信息
+                if (rememberMe) {
+                    Cookie.set('rememberMe', 'true', expirationDays);
+                } else {
+                    Cookie.remove('rememberMe');
+                }
+                
                 message.info('登录成功')
 
                 // 重定向处理
@@ -163,9 +174,11 @@ export function useRegisterOperation() {
             })
 
             if (data?.data) {
-                // 保存登录状态
-                localStorage.setItem('token', data.data.token)
-                localStorage.setItem('tokenExpiry', data.data.exp.toString())
+                // 保存登录状态到cookie
+                Cookie.set('token', data.data.token, 30); // 注册后默认保持登录30天
+                Cookie.set('tokenExpiry', data.data.exp.toString(), 30);
+                Cookie.set('rememberMe', 'true', 30);
+                
                 message.info('注册成功')
 
                 // 重定向处理
@@ -207,6 +220,9 @@ export function useLogin() {
 
     // 合并loading状态
     const isLoading = ref(false)
+    
+    // 添加记住登录状态
+    const rememberMe = ref(true)
 
     // 更新全局加载状态
     watch([isCheckingAccount, isLoggingIn, isRegistering], () => {
@@ -229,7 +245,7 @@ export function useLogin() {
 
         // 登录处理
         if (istologin.value) {
-            return await performLogin(email.value, password.value, captchaToken)
+            return await performLogin(email.value, password.value, captchaToken, rememberMe.value)
         }
 
         // 注册处理 验证码已验证后
@@ -255,6 +271,7 @@ export function useLogin() {
         otp,
         form,
         emailRules,
+        rememberMe,
         login,
         completeOtpVerification
     }

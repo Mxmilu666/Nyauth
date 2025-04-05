@@ -61,5 +61,5 @@ func GetClientinfo(c *gin.Context) {
 		"created_at":  client.CreatedAt,
 	}
 
-	SendResponse(c, http.StatusOK, "获取客户端信息成功", clientInfo)
+	SendResponse(c, http.StatusOK, "获取应用信息成功", clientInfo)
 }

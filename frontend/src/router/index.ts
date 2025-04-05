@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
+import { Cookie } from '@/utils/cookie'
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -58,8 +59,8 @@ const router = createRouter({
 router.beforeEach((to, from, next) => {
     // 检查 path 是否为 /console 或者 /authorize
     if (to.path.startsWith('/console') || to.path.startsWith('/authorize')) {
-        // 验证是否存在token
-        const token = localStorage.getItem('token')
+        // 验证是否存在 token
+        const token = Cookie.get('token')
         if (!token) {
             // 无token，重定向到登录页
             next({

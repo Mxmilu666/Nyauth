@@ -1,5 +1,6 @@
 import axios from 'axios'
 import requestEvent from '@/event/request'
+import { Cookie } from '@/utils/cookie'
 
 export type Response<T = any> = { msg?: string; data?: T; type?: string }
 
@@ -9,8 +10,8 @@ axios.defaults.baseURL = import.meta.env.VITE_HTTP_BASE_URL || '/api/v0'
 // 请求拦截器
 axios.interceptors.request.use(
     async (config) => {
-        // 从 localStorage 获取 token
-        const token = localStorage.getItem('token')
+        // 从 cookie 获取 token
+        const token = Cookie.get('token')
 
         // 如果 token 存在，加到 header
         if (token && config.headers) {
@@ -55,7 +56,10 @@ axios.interceptors.response.use(
             // 未授权错误
             else if (status === 401) {
                 requestEvent.emit('Unauthorized')
-                localStorage.removeItem('token')
+                // 清除cookie中的token
+                Cookie.remove('token')
+                Cookie.remove('tokenExpiry')
+                Cookie.remove('rememberMe')
             }
             // 其他客户端错误
             else {

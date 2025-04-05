@@ -31,6 +31,7 @@ const {
     otp,
     form,
     emailRules,
+    rememberMe,
     login,
     completeOtpVerification
 } = useLogin()
@@ -259,7 +260,7 @@ const handleOtpInput = (otpCode: string) => {
                                 >忘记密码</v-btn
                             >
                             <div v-if="istologin" class="d-flex align-center">
-                                <v-checkbox-btn density="comfortable" color="primary" />
+                                <v-checkbox-btn v-model="rememberMe" density="comfortable" color="primary" />
                                 <div class="text-subtitle-2 text-primary">保持登录</div>
                             </div>
                         </div>
