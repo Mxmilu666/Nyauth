@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"nyauth_backed/source"
 	"nyauth_backed/source/helper"
+	"nyauth_backed/source/models"
 	"nyauth_backed/source/untils"
 
 	"github.com/gin-gonic/gin"
@@ -26,41 +27,21 @@ type JWK struct {
 	E   string `json:"e"`
 }
 
-// OIDCConfiguration 表示 OpenID Connect 配置
-type OIDCConfiguration struct {
-	Issuer                            string   `json:"issuer"`
-	AuthorizationEndpoint             string   `json:"authorization_endpoint"`
-	TokenEndpoint                     string   `json:"token_endpoint"`
-	UserinfoEndpoint                  string   `json:"userinfo_endpoint"`
-	JwksURI                           string   `json:"jwks_uri"`
-	RegistrationEndpoint              string   `json:"registration_endpoint,omitempty"`
-	ScopesSupported                   []string `json:"scopes_supported"`
-	ResponseTypesSupported            []string `json:"response_types_supported"`
-	ResponseModesSupported            []string `json:"response_modes_supported,omitempty"`
-	GrantTypesSupported               []string `json:"grant_types_supported,omitempty"`
-	SubjectTypesSupported             []string `json:"subject_types_supported"`
-	IDTokenSigningAlgValuesSupported  []string `json:"id_token_signing_alg_values_supported"`
-	TokenEndpointAuthMethodsSupported []string `json:"token_endpoint_auth_methods_supported,omitempty"`
-	ClaimsSupported                   []string `json:"claims_supported"`
-}
-
 // GetOpenIDConfiguration 处理 /.well-known/openid-configuration 请求
 // 返回OpenID Connect提供者的配置信息
 func GetOpenIDConfiguration(c *gin.Context) {
 	baseURL := source.AppConfig.Server.BaseURL
 
-	config := OIDCConfiguration{
-		Issuer:                            baseURL,
-		AuthorizationEndpoint:             baseURL + "/oauth/authorize",
-		TokenEndpoint:                     baseURL + "/api/v0/oauth/token",
-		UserinfoEndpoint:                  baseURL + "/api/v0/account/info",
-		JwksURI:                           baseURL + "/.well-known/jwks.json",
-		ScopesSupported:                   []string{"openid", "profile", "email"},
-		ResponseTypesSupported:            []string{"code"},
-		SubjectTypesSupported:             []string{"public"},
-		IDTokenSigningAlgValuesSupported:  []string{"RS256"},
-		TokenEndpointAuthMethodsSupported: []string{"client_secret_post", "client_secret_basic"},
-		ClaimsSupported:                   []string{"sub", "iss", "name", "email", "picture"},
+	config := models.OIDCConfiguration{
+		Issuer:                           baseURL,
+		AuthorizationEndpoint:            baseURL + "/oauth/authorize",
+		TokenEndpoint:                    baseURL + "/api/v0/oauth/token",
+		UserinfoEndpoint:                 baseURL + "/api/v0/account/info",
+		JwksURI:                          baseURL + "/.well-known/jwks.json",
+		ScopesSupported:                  []string{"openid", "profile", "email"},
+		ResponseTypesSupported:           []string{"code"},
+		SubjectTypesSupported:            []string{"public"},
+		IDTokenSigningAlgValuesSupported: []string{"RS256"},
 	}
 
 	c.JSON(http.StatusOK, config)

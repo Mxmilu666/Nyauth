@@ -2,7 +2,6 @@ package oauth
 
 import (
 	"nyauth_backed/source/untils"
-	"strings"
 	"sync"
 	"time"
 )
@@ -73,12 +72,7 @@ func RemoveAuthorizationCode(code string) {
 
 // 定期清理过期的授权码
 func init() {
-	go func() {
-		for {
-			time.Sleep(5 * time.Minute) // 每5分钟清理一次
-			cleanupExpiredCodes()
-		}
-	}()
+	go periodicCleanup(cleanupExpiredCodes, 5*time.Minute)
 }
 
 // cleanupExpiredCodes 清理过期的授权码
@@ -92,23 +86,4 @@ func cleanupExpiredCodes() {
 			delete(authCodes, code)
 		}
 	}
-}
-
-// ValidateScope 验证权限范围
-func ValidateScope(userPermissions []string, targetPermission string) bool {
-	for _, perm := range userPermissions {
-		// 精确匹配
-		if perm == targetPermission {
-			return true
-		}
-
-		// 通配符匹配
-		if strings.HasSuffix(perm, ":*") {
-			prefix := strings.TrimSuffix(perm, ":*")
-			if strings.HasPrefix(targetPermission, prefix+":") {
-				return true
-			}
-		}
-	}
-	return false
 }

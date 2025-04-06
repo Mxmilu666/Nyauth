@@ -66,7 +66,9 @@ func initRouter(r *gin.Engine) *gin.Engine {
 			multiAccount := account.Group("/multi")
 			{
 				// 获取多用户信息
-				multiAccount.GET("/info", handles.OAuthAuthorize)
+				multiAccount.GET("/info", handles.GetMultiIdentities)
+				// 创建多用户身份
+				multiAccount.POST("/create", handles.CreateMultiIdentity)
 			}
 		}
 

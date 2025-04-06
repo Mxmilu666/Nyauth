@@ -14,6 +14,7 @@ type DatabaseUser struct {
 	UpdatedAt    bson.DateTime `bson:"updated_at"`
 	IsBanned     bool          `bson:"is_banned"`
 	Role         string        `bson:"role"`
+	GroupIDs     []string      `bson:"group_ids"` // 用户所属的组ID列表
 }
 
 // client 集合中的文档结构
@@ -29,4 +30,17 @@ type DatabaseClient struct {
 	CreatedBy    string        `bson:"createdBy"`
 	CreatedAt    bson.DateTime `bson:"created_at"`
 	UpdatedAt    bson.DateTime `bson:"updated_at"`
+}
+
+// identity 集合中的文档结构 (用户的多身份)
+type DatabaseUserIdentity struct {
+	UserID      bson.ObjectID `bson:"_id"`
+	UserUUID    string        `bson:"user_uuid"`
+	UserEmail   string        `bson:"user_email"`
+	Attributed  string        `bson:"attributed"`   // 归属的用户ID
+	DisplayName string        `bson:"display_name"` // 显示名称
+	Avatar      string        `bson:"avatar"`       // 身份头像
+	Description string        `bson:"description"`  // 身份描述
+	CreatedAt   bson.DateTime `bson:"created_at"`
+	UpdatedAt   bson.DateTime `bson:"updated_at"`
 }

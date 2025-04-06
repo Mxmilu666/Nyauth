@@ -24,15 +24,15 @@ var (
 
 // CreateToken 创建新的访问令牌并存储在内存中
 func CreateToken(clientID, userID string, scope []string, expiresIn ...int) (string, error) {
-	token, err := untils.GenerateRandomCode(48, false) // 生成随机字符串作为访问令牌
-	if err != nil {
-		return "", err
-	}
-
 	// 默认过期时间为2小时
 	exp := 7200
 	if len(expiresIn) > 0 && expiresIn[0] > 0 {
 		exp = expiresIn[0]
+	}
+
+	token, err := untils.GenerateRandomCode(48, false) // 生成随机字符串作为访问令牌
+	if err != nil {
+		return "", err
 	}
 
 	// 创建令牌对象
@@ -52,7 +52,7 @@ func CreateToken(clientID, userID string, scope []string, expiresIn ...int) (str
 	return token, nil
 }
 
-// 为了兼容性，提供一个接收逗号分隔字符串的创建方法
+// CreateTokenFromString 为了兼容性，提供一个接收逗号分隔字符串的创建方法
 func CreateTokenFromString(clientID, userID, scopeStr string, expiresIn ...int) (string, error) {
 	var scope []string
 	if scopeStr != "" {
@@ -79,12 +79,7 @@ func GetToken(token string) (*Token, bool) {
 
 // HasScope 检查令牌是否具有指定的权限范围
 func (t *Token) HasScope(scope string) bool {
-	for _, s := range t.Scope {
-		if s == scope {
-			return true
-		}
-	}
-	return false
+	return ValidateScope(t.Scope, scope)
 }
 
 // GetScopeString 获取逗号分隔的权限范围字符串
@@ -101,12 +96,7 @@ func RemoveToken(token string) {
 
 // 定期清理过期的访问令牌
 func init() {
-	go func() {
-		for {
-			time.Sleep(15 * time.Minute) // 每15分钟清理一次
-			cleanupExpiredTokens()
-		}
-	}()
+	go periodicCleanup(cleanupExpiredTokens, 15*time.Minute)
 }
 
 // cleanupExpiredTokens 清理过期的访问令牌

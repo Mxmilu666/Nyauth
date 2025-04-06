@@ -16,6 +16,7 @@ import (
 
 var DatabaseName = "nyauth"
 var UserCollection = "users"
+var MultiUserCollection = "multiusers"
 var ClientCollection = "clients"
 var AuthorizationCollection = "authorization"
 
@@ -42,6 +43,12 @@ func InitDatabase() error {
 
 	// 初始化用户集合
 	err = EnsureCollection(client, DatabaseName, UserCollection)
+	if err != nil {
+		return err
+	}
+
+	// 初始化多用户集合
+	err = EnsureCollection(client, DatabaseName, MultiUserCollection)
 	if err != nil {
 		return err
 	}
