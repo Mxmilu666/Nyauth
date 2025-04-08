@@ -21,7 +21,8 @@ const {
     handleAuthorize,
     handleReject,
     authSuccess,
-    redirectUrl
+    redirectUrl,
+    authProcessing
 } = useOAuthAuthorize()
 
 // 从URL获取参数并请求数据
@@ -43,57 +44,73 @@ onMounted(async () => {
                 indeterminate
             ></v-progress-linear>
 
-            <!-- 授权成功状态 -->
-            <div v-if="authSuccess" class="pa-6 text-center">
-                <v-icon size="64" color="success" class="mb-3">mdi-check-circle</v-icon>
-                <p class="text-h6 mb-2">授权已完成，正在跳转回应用...</p>
-            </div>
+            <v-fade-transition mode="out-in">
+                <!-- 授权处理中状态 -->
+                <div v-if="authProcessing" class="pa-6 text-center auth-processing">
+                    <v-progress-circular
+                        indeterminate
+                        color="primary"
+                        size="50"
+                        class="mb-3"
+                    ></v-progress-circular>
+                    <p class="text-h6 mb-2">正在处理您的授权请求...</p>
+                </div>
+            
+                <!-- 授权成功状态 -->
+                <div v-else-if="authSuccess" class="pa-6 text-center auth-success">
+                    <v-scale-transition>
+                        <v-icon size="64" color="success" class="mb-3">mdi-check-circle</v-icon>
+                    </v-scale-transition>
+                    <p class="text-h6 mb-2">授权已完成，正在跳转回应用...</p>
+                </div>
+            
+                <!-- 授权请求状态 -->
+                <v-row v-else no-gutters>
+                    <v-col cols="12" sm="4" class="app-info bg-primary">
+                        <AppInfo v-bind="appInfo" />
+                    </v-col>
 
-            <v-row v-else no-gutters>
-                <v-col cols="12" sm="4" class="app-info bg-primary">
-                    <AppInfo v-bind="appInfo" />
-                </v-col>
+                    <v-col cols="12" sm="8" class="pa-4 pa-sm-6">
+                        <h2 class="text-h5 mb-2">授权请求</h2>
+                        <p class="mb-4 text-body-1">
+                            <strong>{{ appInfo.appName }}</strong> 请求访问您的账户
+                        </p>
 
-                <v-col cols="12" sm="8" class="pa-4 pa-sm-6">
-                    <h2 class="text-h5 mb-2">授权请求</h2>
-                    <p class="mb-4 text-body-1">
-                        <strong>{{ appInfo.appName }}</strong> 请求访问您的账户
-                    </p>
+                        <v-divider class="mb-4" />
 
-                    <v-divider class="mb-4" />
+                        <PermissionList :permissions="permissions" />
 
-                    <PermissionList :permissions="permissions" />
+                        <div class="mt-4">
+                            <IdentitySelector
+                                :identities="identities"
+                                v-model:selectedIdentityId="selectedIdentityId"
+                                :selectedIdentity="selectedIdentity"
+                            />
+                        </div>
 
-                    <div class="mt-4">
-                        <IdentitySelector
-                            :identities="identities"
-                            v-model:selectedIdentityId="selectedIdentityId"
-                            :selectedIdentity="selectedIdentity"
-                        />
-                    </div>
-
-                    <v-card-actions>
-                        <v-spacer />
-                        <v-btn
-                            variant="text"
-                            color="error"
-                            class="mr-2"
-                            prepend-icon="mdi-close"
-                            @click="handleReject"
-                        >
-                            拒绝访问
-                        </v-btn>
-                        <v-btn
-                            color="primary"
-                            variant="elevated"
-                            prepend-icon="mdi-check"
-                            @click="handleAuthorize"
-                        >
-                            允许访问
-                        </v-btn>
-                    </v-card-actions>
-                </v-col>
-            </v-row>
+                        <v-card-actions>
+                            <v-spacer />
+                            <v-btn
+                                variant="text"
+                                color="error"
+                                class="mr-2"
+                                prepend-icon="mdi-close"
+                                @click="handleReject"
+                            >
+                                拒绝访问
+                            </v-btn>
+                            <v-btn
+                                color="primary"
+                                variant="elevated"
+                                prepend-icon="mdi-check"
+                                @click="handleAuthorize"
+                            >
+                                允许访问
+                            </v-btn>
+                        </v-card-actions>
+                    </v-col>
+                </v-row>
+            </v-fade-transition>
         </v-card>
     </v-container>
 </template>
@@ -118,5 +135,13 @@ onMounted(async () => {
 :deep(.v-card) {
     width: 95%;
     max-width: 900px;
+}
+
+.auth-processing, .auth-success {
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 </style>

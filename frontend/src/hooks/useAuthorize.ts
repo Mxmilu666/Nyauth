@@ -113,6 +113,8 @@ export function useOAuthAuthorize() {
         state: ''
     })
 
+    // 授权处理中状态
+    const authProcessing = ref(false)
     // 授权成功状态
     const authSuccess = ref(false)
     // 重定向URL
@@ -198,23 +200,44 @@ export function useOAuthAuthorize() {
     // 处理授权操作
     const handleAuthorize = async () => {
         try {
+            // 设置处理中状态
+            authProcessing.value = true
+
+            // 发送授权请求
             const { data: response } = await getOAuthAuthorize(oauthParams.value)
+            
+            // 添加1秒延迟模拟处理过程
+            await new Promise(resolve => setTimeout(resolve, 1000))
+            
             if (response && response.data !== undefined) {
                 // 保存重定向URL
                 redirectUrl.value = response.data.redirect_url
-                // 设置授权成功状态
+                
+                // 切换到授权成功状态
+                authProcessing.value = false
                 authSuccess.value = true
 
                 // 延迟2秒后跳转
                 setTimeout(() => {
                     window.location.href = redirectUrl.value
-                }, 1000)
+                }, 2000)
             } else {
+                // 处理错误
+                authProcessing.value = false
                 error.value = response.msg || '授权失败'
+                modal.error({
+                    title: '授权失败',
+                    content: error.value
+                })
             }
         } catch (err) {
             console.error('授权请求失败:', err)
+            authProcessing.value = false
             error.value = '授权请求失败，请稍后再试'
+            modal.error({
+                title: '授权失败',
+                content: error.value
+            })
         }
     }
 
@@ -246,6 +269,7 @@ export function useOAuthAuthorize() {
         handleAuthorize,
         handleReject,
         authSuccess,
-        redirectUrl
+        redirectUrl,
+        authProcessing // 新增授权处理中状态
     }
 }
