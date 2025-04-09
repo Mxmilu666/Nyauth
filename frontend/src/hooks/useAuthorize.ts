@@ -223,7 +223,6 @@ export function useOAuthAuthorize() {
                 }, 2000)
             } else {
                 // 处理错误
-                authProcessing.value = false
                 error.value = response.msg || '授权失败'
                 modal.error({
                     title: '授权失败',

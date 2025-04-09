@@ -216,7 +216,11 @@ const handleOtpInput = (otpCode: string) => {
                                 required
                             />
                             <v-slide-y-transition :leave-absolute="true">
-                                <loginform v-if="istologin" v-model="password" />
+                                <loginform
+                                    v-if="istologin"
+                                    v-model="password"
+                                    @enter="handleAuthentication"
+                                />
                                 <otpform
                                     v-if="istoregister && !isOtpVerified"
                                     :email="email"
@@ -260,7 +264,11 @@ const handleOtpInput = (otpCode: string) => {
                                 >忘记密码</v-btn
                             >
                             <div v-if="istologin" class="d-flex align-center">
-                                <v-checkbox-btn v-model="rememberMe" density="comfortable" color="primary" />
+                                <v-checkbox-btn
+                                    v-model="rememberMe"
+                                    density="comfortable"
+                                    color="primary"
+                                />
                                 <div class="text-subtitle-2 text-primary">保持登录</div>
                             </div>
                         </div>

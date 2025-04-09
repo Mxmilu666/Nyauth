@@ -35,7 +35,7 @@ onMounted(async () => {
 const getCaptchaKey = async () => {
     try {
         const { data } = await getCaptcha()
-        if (data !== undefined) {
+        if (data && data.data !== undefined) {
             return data.data.id
         }
         return null
@@ -74,7 +74,11 @@ function closeDialog() {
                 class="d-flex justify-center align-center"
                 style="min-height: 100px"
             >
-                <vue-turnstile :site-key="captchaKey" v-model="turnstileToken" />
+                <vue-turnstile
+                    :site-key="captchaKey"
+                    v-model="turnstileToken"
+                    class="rounded"
+                />
             </v-card-text>
         </v-card>
     </v-dialog>
