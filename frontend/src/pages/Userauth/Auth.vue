@@ -36,7 +36,7 @@ const {
     completeOtpVerification
 } = useLogin()
 
-// 进入注册流程时发送OTP
+// 进入注册流程时发送 OTP
 watch(istoregister, (isRegistering) => {
     if (isRegistering && !isOtpVerified.value && !currentOtp.value) {
         turnstilePurpose.value = 'sendOtp'
