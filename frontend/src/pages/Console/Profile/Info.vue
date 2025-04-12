@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { defineOptions, inject, ref } from 'vue'
+import { defineOptions, inject } from 'vue'
 import BasicInfoCard from './BasicInfoCard.vue'
 import MultiaccountsContainer from './MultiaccountsContainer.vue'
 import { useUserStore } from '@/stores/user'
+import { useMultiAccounts } from '@/hooks/useMultiAccounts'
+import Console from '../Console.vue'
 
 defineOptions({
     name: 'InfoPage'
@@ -11,33 +13,9 @@ defineOptions({
 const avatar = inject('avatar') as string
 const userStore = useUserStore()
 
-// TODO：迁到 HOOK 里
-const accounts = ref([
-    {
-        avatar: avatar,
-        userName: '米露',
-        lastActiveTime: '昨天 18:30',
-        tagText: '主账号'
-    },
-    {
-        avatar: avatar,
-        userName: '西米米米米米米米米米米米米米米米米米米米米米米米米米',
-        lastActiveTime: '上周五 12:15',
-        tagText: 'Alist'
-    },
-    {
-        avatar: avatar,
-        userName: '喵喵',
-        lastActiveTime: '2周前',
-        tagText: 'Blog'
-    },
-    {
-        avatar: avatar,
-        userName: 'baka',
-        lastActiveTime: '2周前',
-        tagText: 'Blist'
-    }
-])
+// 使用 hook 获取多账户信息
+const { accounts, loading, error, fetchMultiAccounts } = useMultiAccounts()
+console.log('accounts', accounts)
 </script>
 
 <template>
@@ -67,7 +45,17 @@ const accounts = ref([
             </div>
             <v-row>
                 <v-col cols="12">
-                    <MultiaccountsContainer :accounts="accounts" />
+                    <v-card v-if="loading" class="pa-4">
+                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                        <span class="ml-3">正在加载账户信息...</span>
+                    </v-card>
+                    <v-card v-else-if="error" class="pa-4">
+                        <v-alert type="error" title="加载失败" :text="error.message"></v-alert>
+                    </v-card>
+                    <v-card v-else-if="!accounts || accounts.length === 0" class="pa-4">
+                        <v-alert type="info" title="暂无多账户" text="您目前没有关联的多账户信息"></v-alert>
+                    </v-card>
+                    <MultiaccountsContainer v-else :accounts="accounts" />
                 </v-col>
             </v-row>
         </div>

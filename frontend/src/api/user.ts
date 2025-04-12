@@ -1,4 +1,5 @@
 import axios, { type Response } from '@/utils/axios'
+
 export const getAccountInfo = () => {
     return axios.get<
         Response<{
