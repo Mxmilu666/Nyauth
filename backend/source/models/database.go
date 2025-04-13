@@ -14,7 +14,6 @@ type DatabaseUser struct {
 	UpdatedAt    bson.DateTime `bson:"updated_at"`
 	IsBanned     bool          `bson:"is_banned"`
 	Role         string        `bson:"role"`
-	GroupIDs     []string      `bson:"group_ids"` // 用户所属的组ID列表
 }
 
 // client 集合中的文档结构
