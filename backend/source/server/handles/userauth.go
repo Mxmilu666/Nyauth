@@ -123,6 +123,22 @@ func SendVerificationCode(c *gin.Context) {
 		return
 	}
 
+	// 验证Turnstile验证码
+	//if creds.Secretkey == "" {
+	//	SendResponse(c, http.StatusBadRequest, "验证码不能为空", nil)
+	//	return
+	//}
+
+	//success, err := VerifyTurnstile(creds.Secretkey)
+	//if err != nil {
+	//	SendResponse(c, http.StatusInternalServerError, "验证码验证过程出错", nil)
+	//	return
+	//}
+	//if !success {
+	//	SendResponse(c, http.StatusBadRequest, "验证码验证失败", nil)
+	//	return
+	//}
+
 	// 从查询参数中读取 usefor
 	usefor := c.Query("usefor")
 	if usefor == "" {

@@ -6,6 +6,7 @@ import (
 	"nyauth_backed/source/database"
 	"nyauth_backed/source/helper"
 	"nyauth_backed/source/models"
+	"nyauth_backed/source/untils"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -28,14 +29,16 @@ func CreateMultiIdentity(c *gin.Context) {
 		return
 	}
 
-	// 验证临时码
-	if !helper.VerifyTempCode(req.Email, req.TempCode, "multi_identity") {
-		SendResponse(c, http.StatusBadRequest, "验证已过期或无效，请重新验证邮箱", nil)
+	// 验证验证码
+	if !helper.VerifyCode(req.Email, req.Code, "multi_identity") {
+		SendResponse(c, http.StatusBadRequest, "验证码错误或已过期", nil)
 		return
 	}
 
+	avatar := "https://cravatar.cn/avatar/" + untils.MD5(req.Email) + "?s=256"
+
 	// 创建新的身份
-	identityID, err := database.CreateUserIdentity(userID, req.Email, req.DisplayName, req.Description, req.Avatar)
+	identityID, err := database.CreateUserIdentity(userID, req.Email, req.DisplayName, req.Description, avatar)
 	if err != nil {
 		fmt.Printf("CreateUserIdentity err: %s\n", err.Error())
 		SendResponse(c, http.StatusInternalServerError, "创建多身份失败", nil)

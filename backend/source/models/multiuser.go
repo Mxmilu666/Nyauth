@@ -5,6 +5,6 @@ type MultiuserCredentials struct {
 	DisplayName string `json:"display_name" binding:"required"`
 	Email       string `json:"email" binding:"required,email"`
 	Description string `json:"description"`
-	Avatar      string `json:"avatar"`
-	TempCode    string `json:"temp_code" binding:"required"` // 邮箱验证临时码
+	// Avatar      string `json:"avatar"`
+	Code string `json:"code" binding:"required"` // 邮箱验证码
 }

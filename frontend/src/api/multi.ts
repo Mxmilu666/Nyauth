@@ -16,3 +16,16 @@ export const getMultiAccountsInfo = () => {
         }>
     >('/account/multi/info')
 }
+
+export const createMultiAccounts = (data: {
+    display_name: string
+    email: string
+    description?: string
+    code: string
+}) => {
+    return axios.post<
+        Response<{
+            identity_id: string
+        }>
+    >('/account/multi/create', data)
+}
