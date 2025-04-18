@@ -63,7 +63,7 @@ const handleCaptchaVerify = async (token: string) => {
 // 发送OTP验证码
 const sendUserOtp = async (token: string) => {
     if (!email.value) {
-        message.info('请输入有效的邮箱地址')
+        message.warning('请输入有效的邮箱地址')
         return
     }
 
@@ -76,9 +76,9 @@ const sendUserOtp = async (token: string) => {
         })
 
         if (data) {
-            message.info('验证码已发送至您的邮箱，请查收')
+            message.success('验证码已发送至您的邮箱，请查收')
         } else {
-            message.info('验证码发送失败，请重试')
+            message.error('验证码发送失败，请重试')
         }
     } catch (error) {
         console.error('发送OTP出错:', error)
@@ -114,7 +114,7 @@ const handleAuthentication = async () => {
     // 验证验证码
     if (istoregister.value && !isOtpVerified.value) {
         if (!currentOtp.value || currentOtp.value.length < 6) {
-            message.info('请输入完整的验证码')
+            message.warning('请输入完整的验证码')
             return
         }
 
@@ -129,11 +129,11 @@ const handleAuthentication = async () => {
             if (data?.data) {
                 completeOtpVerification(data.data.temp_code)
             } else {
-                message.info('验证码验证失败，请检查后重试')
+                message.error('验证码验证失败，请检查后重试')
             }
         } catch (error) {
             console.error('OTP验证出错:', error)
-            message.info('验证码验证过程中出现错误')
+            message.error('验证码验证过程中出现错误')
         } finally {
             otpVerifying.value = false
         }
@@ -183,7 +183,7 @@ const handleOtpInput = (otpCode: string) => {
                             :active="isActive"
                             color="primary"
                             indeterminate
-                        ></v-progress-linear>
+                        />
                     </template>
                     <v-card-title class="text-center">
                         <div class="py-5">

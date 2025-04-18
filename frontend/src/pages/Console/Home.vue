@@ -14,7 +14,7 @@ const { avatar, timeGreeting } = useConsole()
 
 <template>
     <v-container class="center">
-        <v-avatar :image="avatar" size="110"></v-avatar>
+        <v-avatar :image="avatar" size="110" />
         <p class="text-h5 pt-4 font-weight-bold">
             {{ userStore.userInfo.user_name || 'Baka' }}，{{ timeGreeting }}
         </p>

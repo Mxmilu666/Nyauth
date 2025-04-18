@@ -37,12 +37,7 @@ onMounted(async () => {
         fluid
     >
         <v-card max-width="900" class="mx-auto" elevation="3">
-            <v-progress-linear
-                v-if="loading"
-                color="primary"
-                height="4"
-                indeterminate
-            ></v-progress-linear>
+            <v-progress-linear v-if="loading" color="primary" height="4" indeterminate />
 
             <v-fade-transition mode="out-in">
                 <!-- 授权处理中状态 -->
@@ -52,18 +47,20 @@ onMounted(async () => {
                         color="primary"
                         size="50"
                         class="mb-3"
-                    ></v-progress-circular>
+                    />
                     <p class="text-h6 mb-2">正在处理您的授权请求...</p>
                 </div>
-            
+
                 <!-- 授权成功状态 -->
                 <div v-else-if="authSuccess" class="pa-6 text-center auth-success">
                     <v-scale-transition>
-                        <v-icon size="64" color="success" class="mb-3">mdi-check-circle</v-icon>
+                        <v-icon size="64" color="success" class="mb-3"
+                            >mdi-check-circle</v-icon
+                        >
                     </v-scale-transition>
                     <p class="text-h6 mb-2">授权已完成，正在跳转回应用...</p>
                 </div>
-            
+
                 <!-- 授权请求状态 -->
                 <v-row v-else no-gutters>
                     <v-col cols="12" sm="4" class="app-info bg-primary">
@@ -137,7 +134,8 @@ onMounted(async () => {
     max-width: 900px;
 }
 
-.auth-processing, .auth-success {
+.auth-processing,
+.auth-success {
     min-height: 200px;
     display: flex;
     flex-direction: column;

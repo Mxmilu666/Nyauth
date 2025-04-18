@@ -4,7 +4,7 @@ import { message } from '@/services/message'
 import { modal } from '@/services/modal'
 
 requestEvent.on('Unauthorized', () => {
-    message.info('无效的登录会话，请重新登录')
+    message.error('无效的登录会话，请重新登录')
 })
 
 requestEvent.on('NetworkError', (statusResult: string | boolean) => {

@@ -12,7 +12,7 @@ const props = defineProps<{
 </script>
 
 <template>
-    <v-card>
+    <v-card height="92">
         <v-card-text>
             <div class="d-flex align-center">
                 <v-avatar :image="avatar" size="60" class="me-4" />

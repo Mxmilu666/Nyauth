@@ -36,7 +36,7 @@ const cancelEditing = () => {
 
 const saveUserName = async () => {
     if (!newUserName.value.trim()) {
-        message.info('用户名不能为空')
+        message.warning('用户名不能为空')
         return
     }
 
@@ -50,10 +50,10 @@ const saveUserName = async () => {
         const result = await updateUserName(newUserName.value)
         if (result.success) {
             userName.value = newUserName.value
-            message.info(result.message)
+            message.success(result.message)
             isEditing.value = false
         } else {
-            message.info(result.message)
+            message.error(result.message)
         }
     } finally {
         loading.value = false
@@ -98,7 +98,7 @@ const saveUserName = async () => {
                                 :rules="[(v) => !!v || '用户名不能为空']"
                                 class="mt-2"
                                 hide-details="auto"
-                            ></v-text-field>
+                            />
 
                             <div class="d-flex justify-end mt-4 gap-2">
                                 <v-btn

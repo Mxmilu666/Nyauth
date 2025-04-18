@@ -15,7 +15,11 @@ const userStore = useUserStore()
 
 // 使用 hook 获取多账户信息
 const { accounts, loading, error, fetchMultiAccounts } = useMultiAccounts()
-console.log('accounts', accounts)
+
+// 处理刷新多账户列表事件
+const handleRefreshAccounts = () => {
+    fetchMultiAccounts()
+}
 </script>
 
 <template>
@@ -46,16 +50,24 @@ console.log('accounts', accounts)
             <v-row>
                 <v-col cols="12">
                     <v-card v-if="loading" class="pa-4">
-                        <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                        <v-progress-circular indeterminate color="primary" />
                         <span class="ml-3">正在加载账户信息...</span>
                     </v-card>
                     <v-card v-else-if="error" class="pa-4">
-                        <v-alert type="error" title="加载失败" :text="error.message"></v-alert>
+                        <v-alert type="error" title="加载失败" :text="error.message" />
                     </v-card>
                     <v-card v-else-if="!accounts || accounts.length === 0" class="pa-4">
-                        <v-alert type="info" title="暂无多账户" text="您目前没有关联的多账户信息"></v-alert>
+                        <v-alert
+                            type="info"
+                            title="暂无多账户"
+                            text="您目前没有关联的多账户信息"
+                        />
                     </v-card>
-                    <MultiaccountsContainer v-else :accounts="accounts" />
+                    <MultiaccountsContainer
+                        v-else
+                        :accounts="accounts"
+                        @refresh-accounts="handleRefreshAccounts"
+                    />
                 </v-col>
             </v-row>
         </div>

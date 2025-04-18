@@ -124,14 +124,14 @@ export function useLoginOperation() {
                     Cookie.remove('rememberMe');
                 }
                 
-                message.info('登录成功')
+                message.success('登录成功')
 
                 // 重定向处理
                 const redirectPath = (route.query.redirect as string) || '/console'
                 router.push(redirectPath)
                 return true
             } else {
-                message.info('登录失败，请重试')
+                message.error('登录失败，请重试')
                 return false
             }
         } catch (error) {
@@ -179,7 +179,7 @@ export function useRegisterOperation() {
                 Cookie.set('tokenExpiry', data.data.exp.toString(), 30);
                 Cookie.set('rememberMe', 'true', 30);
                 
-                message.info('注册成功')
+                message.success('注册成功')
 
                 // 重定向处理
                 const redirectPath = (route.query.redirect as string) || '/console'
@@ -190,7 +190,7 @@ export function useRegisterOperation() {
         } catch (error: any) {
             console.error('注册失败:', error)
             const errorMessage = error.response?.data?.message || '注册失败，请稍后重试'
-            message.info(errorMessage)
+            message.error(errorMessage)
             return false
         } finally {
             isLoading.value = false
