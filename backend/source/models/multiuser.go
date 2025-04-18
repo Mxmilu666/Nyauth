@@ -1,9 +1,10 @@
 package models
 
-// 解析多用户请求体中的数据
-var MultiuserCredentials struct {
+// MultiuserCredentials 多用户身份创建参数
+type MultiuserCredentials struct {
 	DisplayName string `json:"display_name" binding:"required"`
 	Email       string `json:"email" binding:"required,email"`
-	Description string `jsson:"description"`
+	Description string `json:"description"`
 	Avatar      string `json:"avatar"`
+	TempCode    string `json:"temp_code" binding:"required"` // 邮箱验证临时码
 }

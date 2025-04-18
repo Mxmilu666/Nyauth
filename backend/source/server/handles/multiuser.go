@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"nyauth_backed/source/database"
+	"nyauth_backed/source/helper"
 	"nyauth_backed/source/models"
 
 	"github.com/gin-gonic/gin"
@@ -20,10 +21,16 @@ func CreateMultiIdentity(c *gin.Context) {
 	}
 	userID := claims.(jwt.MapClaims)["data"].(map[string]interface{})["user_id"].(string)
 
-	req := models.MultiuserCredentials
+	var req models.MultiuserCredentials
 
 	if err := c.ShouldBindJSON(&req); err != nil {
 		SendResponse(c, http.StatusBadRequest, "请求参数错误", nil)
+		return
+	}
+
+	// 验证临时码
+	if !helper.VerifyTempCode(req.Email, req.TempCode, "multi_identity") {
+		SendResponse(c, http.StatusBadRequest, "验证已过期或无效，请重新验证邮箱", nil)
 		return
 	}
 

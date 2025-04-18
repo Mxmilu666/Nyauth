@@ -132,22 +132,14 @@ func SendVerificationCode(c *gin.Context) {
 
 	// 根据 usefor 执行对应的操作
 	switch usefor {
-	case "register":
-		err := helper.SendVerificationCodeByEmail(creds.Useremail, "register")
+	case "register", "reset_password", "multi_identity":
+		err := helper.SendVerificationCodeByEmail(creds.Useremail, usefor)
 		if err != nil {
 			if errors.Is(err, helper.ErrVerificationCodeExists) {
 				// 验证码已存在并且未过期
 				SendResponse(c, http.StatusTooManyRequests, "验证码还未过期呢，请等待一会再发送吧", nil)
 				return
 			}
-			logger.Error("Failed to send verification code: ", err)
-			SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
-			return
-		}
-		SendResponse(c, http.StatusOK, "发送验证码成功! 请注意查收~", nil)
-	case "reset_password":
-		err := helper.SendVerificationCodeByEmail(creds.Useremail, "reset_password")
-		if err != nil {
 			logger.Error("Failed to send verification code: ", err)
 			SendResponse(c, http.StatusInternalServerError, "发送验证码时出错", nil)
 			return
