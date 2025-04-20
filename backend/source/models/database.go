@@ -14,6 +14,8 @@ type DatabaseUser struct {
 	UpdatedAt    bson.DateTime `bson:"updated_at"`
 	IsBanned     bool          `bson:"is_banned"`
 	Role         string        `bson:"role"`
+	TOTPEnabled  bool          `bson:"totp_enabled"` // 是否启用二次验证
+	TOTPSecret   string        `bson:"totp_secret"`
 }
 
 // client 集合中的文档结构

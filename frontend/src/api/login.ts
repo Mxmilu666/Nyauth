@@ -5,6 +5,7 @@ export const getAccountStatus = (data: { username: string }) => {
             exists: boolean
             user_info?: {
                 email: string
+                enable_totp: boolean
             }
         }>
     >('/account/getaccountstatus', data)
