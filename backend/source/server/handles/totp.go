@@ -72,7 +72,7 @@ func GenerateTOTP(c *gin.Context) {
 		"qr_code":  key.URL(),
 		"issuer":   "Nyauth",
 		"account":  user.UserEmail,
-		"exp_time": 10 * 60, // 10分钟过期时间（秒）
+		"exp_time": 10 * 60, // 10分钟过期时间
 	}
 
 	SendResponse(c, http.StatusOK, "TOTP密钥生成成功", response)
