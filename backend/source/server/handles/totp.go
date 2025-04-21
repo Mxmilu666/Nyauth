@@ -6,7 +6,6 @@ import (
 	"nyauth_backed/source/database"
 	"nyauth_backed/source/helper"
 	"nyauth_backed/source/models"
-	"nyauth_backed/source/untils"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -120,8 +119,8 @@ func VerifyAndEnableTOTP(c *gin.Context) {
 	// 清除临时密钥
 	helper.RemoveTempTOTPSecret(tempKey)
 
-	// 生成恢复码（可选）
-	recoveryCodes, err := generateRecoveryCodes(userID)
+	// 生成恢复码（使用database包中的函数）
+	recoveryCodes, err := database.GenerateAndSaveRecoveryCodes(userID, 5)
 	if err != nil {
 		SendResponse(c, http.StatusInternalServerError, "生成恢复码失败", nil)
 		return
@@ -167,7 +166,7 @@ func VerifyTOTP(c *gin.Context) {
 	valid := totp.Validate(req.Code, secret)
 	if !valid {
 		// 检查是否使用恢复码
-		isRecoveryCode, err := checkRecoveryCode(user.UserID.Hex(), req.Code)
+		isRecoveryCode, err := database.ValidateAndConsumeRecoveryCode(user.UserID.Hex(), req.Code)
 		if err != nil || !isRecoveryCode {
 			SendResponse(c, http.StatusBadRequest, "验证码无效", nil)
 			return
@@ -217,34 +216,4 @@ func DisableTOTP(c *gin.Context) {
 	}
 
 	SendResponse(c, http.StatusOK, "TOTP已禁用", nil)
-}
-
-// 生成恢复码
-func generateRecoveryCodes(userID string) ([]string, error) {
-	const codeCount = 5
-	codes := make([]string, codeCount)
-
-	for i := 0; i < codeCount; i++ {
-		// 生成8位恢复码
-		code, err := untils.GenerateRandomCode(8, true)
-		if err != nil {
-			return nil, err
-		}
-		codes[i] = code
-	}
-
-	// 保存恢复码到数据库
-	err := database.SaveRecoveryCodes(userID, codes)
-	if err != nil {
-		return nil, err
-	}
-
-	return codes, nil
-}
-
-// 检查恢复码是否有效
-func checkRecoveryCode(userID, code string) (bool, error) {
-	// 从数据库检查恢复码是否有效
-	isValid, err := database.ValidateAndConsumeRecoveryCode(userID, code)
-	return isValid, err
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"nyauth_backed/source/models"
+	"nyauth_backed/source/untils"
 	"time"
 
 	"go.mongodb.org/mongo-driver/v2/bson"
@@ -158,4 +159,30 @@ func ValidateAndConsumeRecoveryCode(userID, code string) (bool, error) {
 	}
 
 	return true, nil
+}
+
+// GenerateAndSaveRecoveryCodes 生成恢复码并保存到数据库
+func GenerateAndSaveRecoveryCodes(userID string, codeCount int) ([]string, error) {
+	if codeCount <= 0 {
+		codeCount = 5 // 默认生成5个恢复码
+	}
+
+	codes := make([]string, codeCount)
+
+	for i := 0; i < codeCount; i++ {
+		// 生成8位恢复码
+		code, err := untils.GenerateRandomCode(8, true)
+		if err != nil {
+			return nil, err
+		}
+		codes[i] = code
+	}
+
+	// 保存恢复码到数据库
+	err := SaveRecoveryCodes(userID, codes)
+	if err != nil {
+		return nil, err
+	}
+
+	return codes, nil
 }
