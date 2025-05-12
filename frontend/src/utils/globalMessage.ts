@@ -36,7 +36,7 @@ requestEvent.on('UnknownError', () => {
 })
 
 requestEvent.on('Message', (type: 'success' | 'error' | 'warn', msg: string) => {
-    if (type == 'success') message.info(msg)
-    if (type == 'error') message.info(msg)
-    if (type == 'warn') message.info(msg)
+    if (type == 'success') message.success(msg)
+    if (type == 'error') message.error(msg)
+    if (type == 'warn') message.warning(msg)
 })
