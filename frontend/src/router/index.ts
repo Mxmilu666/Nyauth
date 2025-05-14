@@ -43,7 +43,7 @@ const router = createRouter({
                 {
                     path: 'security',
                     name: 'SecurityPage',
-                    component: () => import('@/pages/Console/Security/security.vue')
+                    component: () => import('@/pages/Console/Security/Security.vue')
                 }
             ]
         },
