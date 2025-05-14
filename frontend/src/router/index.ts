@@ -44,6 +44,11 @@ const router = createRouter({
                     path: 'security',
                     name: 'SecurityPage',
                     component: () => import('@/pages/Console/Security/Security.vue')
+                },
+                {
+                    path: 'security/totp',
+                    name: 'TotpSecurityPage',
+                    component: () => import('@/pages/Console/Security/Detail/Totp.vue')
                 }
             ]
         },
