@@ -23,7 +23,7 @@ const recoveryCodes = ref<string[]>([])
 // 生成二维码图像
 const generateQRCodeImage = async () => {
     if (!qrCode.value) return
-    
+
     try {
         // 将文本内容转换为二维码图像数据URL
         const url = await QRCode.toDataURL(qrCode.value, {
@@ -66,7 +66,7 @@ const checkTotpStatus = async () => {
 const startSetupTotp = async () => {
     loading.value = true
     setupStep.value = 1
-    
+
     try {
         const { data } = await generateTOTP()
         if (data?.data) {
@@ -90,7 +90,7 @@ const verifyTotp = async () => {
         message.warning('请输入6位验证码')
         return
     }
-    
+
     loading.value = true
     try {
         const { data } = await firstVerifyTOTP({ code: verificationCode.value })
@@ -118,7 +118,8 @@ const disableTotp = async () => {
 const copyRecoveryCodes = () => {
     if (recoveryCodes.value.length) {
         const text = recoveryCodes.value.join('\n')
-        navigator.clipboard.writeText(text)
+        navigator.clipboard
+            .writeText(text)
             .then(() => message.success('恢复码已复制到剪贴板'))
             .catch(() => message.error('复制失败，请手动复制'))
     }
@@ -134,7 +135,8 @@ const resetSetup = () => {
 }
 
 const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text)
+    navigator.clipboard
+        .writeText(text)
         .then(() => message.success('已复制到剪贴板'))
         .catch(() => message.error('复制失败，请手动复制'))
 }
@@ -162,7 +164,10 @@ onMounted(() => {
 
                 <v-card v-if="!loading || setupStep > 0" class="my-4">
                     <v-card-text>
-                        <div v-if="setupStep === 0" class="d-flex align-center justify-space-between">
+                        <div
+                            v-if="setupStep === 0"
+                            class="d-flex align-center justify-space-between"
+                        >
                             <div>
                                 <div class="text-subtitle-1 font-weight-medium">
                                     两步验证
@@ -172,7 +177,11 @@ onMounted(() => {
                                         :color="totpEnabled ? 'success' : 'error'"
                                         class="me-2"
                                     >
-                                        {{ totpEnabled ? 'mdi-shield-check' : 'mdi-shield-off-outline' }}
+                                        {{
+                                            totpEnabled
+                                                ? 'mdi-shield-check'
+                                                : 'mdi-shield-off-outline'
+                                        }}
                                     </v-icon>
                                     <span>{{ totpEnabled ? '已启用' : '未启用' }}</span>
                                 </div>
@@ -188,7 +197,7 @@ onMounted(() => {
 
                         <div v-if="setupStep === 1">
                             <h3 class="text-h6 mb-4">第1步：扫描二维码</h3>
-                            
+
                             <div class="text-center mb-4">
                                 <div class="d-flex justify-center mb-2">
                                     <v-img
@@ -206,19 +215,24 @@ onMounted(() => {
                                         width="200"
                                     ></v-skeleton-loader>
                                 </div>
-                                
+
                                 <p class="text-body-2 mt-2">
-                                    使用 Google Authenticator、Microsoft Authenticator 等验证器应用扫描上方二维码
+                                    使用 Google Authenticator、Microsoft Authenticator
+                                    等验证器应用扫描上方二维码
                                 </p>
 
-                                <v-sheet
-                                    class="mt-4 pa-3 rounded"
-                                    elevation="0"
-                                >
+                                <v-card class="mt-4 pa-3" elevation="0" variant="tonal">
                                     <div class="d-flex align-center flex-nowrap mb-1">
-                                        <span class="text-subtitle-2 text-no-wrap">密钥：</span>
-                                        <div class="d-flex align-center flex-grow-1 overflow-auto">
-                                            <span class="text-body-1 font-weight-medium mx-2">{{ secret }}</span>
+                                        <span class="text-subtitle-2 text-no-wrap"
+                                            >密钥：</span
+                                        >
+                                        <div
+                                            class="d-flex align-center flex-grow-1 overflow-auto"
+                                        >
+                                            <span
+                                                class="text-body-1 font-weight-medium mx-2"
+                                                >{{ secret }}</span
+                                            >
                                             <v-btn
                                                 density="compact"
                                                 icon="mdi-content-copy"
@@ -229,22 +243,20 @@ onMounted(() => {
                                             ></v-btn>
                                         </div>
                                     </div>
-                                    <p class="text-caption">如果无法扫描二维码，请手动输入上面的密钥</p>
-                                </v-sheet>
+                                    <p class="text-caption">
+                                        如果无法扫描二维码，请手动输入上面的密钥
+                                    </p>
+                                </v-card>
                             </div>
 
-                            <v-btn
-                                block
-                                color="primary"
-                                @click="setupStep = 2"
-                            >
+                            <v-btn block color="primary" @click="setupStep = 2">
                                 继续
                             </v-btn>
                         </div>
 
                         <div v-if="setupStep === 2">
                             <h3 class="text-h6 mb-4">第2步：输入验证码</h3>
-                            
+
                             <p class="mb-4">
                                 请打开您的验证器应用，获取6位数验证码并输入以下框中：
                             </p>
@@ -253,7 +265,10 @@ onMounted(() => {
                                 <v-text-field
                                     v-model="verificationCode"
                                     label="验证码"
-                                    :rules="[v => !!v || '请输入验证码', v => v.length === 6 || '验证码应为6位数']"
+                                    :rules="[
+                                        (v) => !!v || '请输入验证码',
+                                        (v) => v.length === 6 || '验证码应为6位数'
+                                    ]"
                                     type="text"
                                     inputmode="numeric"
                                     maxlength="6"
@@ -283,7 +298,7 @@ onMounted(() => {
 
                         <div v-if="setupStep === 3">
                             <h3 class="text-h6 mb-4">两步验证已启用</h3>
-                            
+
                             <v-alert
                                 type="warning"
                                 title="保存您的恢复码"
@@ -293,8 +308,8 @@ onMounted(() => {
                                 icon="mdi-alert-circle"
                             ></v-alert>
 
-                            <v-sheet 
-                                class="pa-4 mb-4 rounded" 
+                            <v-sheet
+                                class="pa-4 mb-4 rounded"
                                 color="grey-lighten-4"
                                 elevation="0"
                                 border
@@ -319,12 +334,7 @@ onMounted(() => {
                                 >
                                     复制恢复码
                                 </v-btn>
-                                <v-btn
-                                    color="primary"
-                                    @click="resetSetup"
-                                >
-                                    完成
-                                </v-btn>
+                                <v-btn color="primary" @click="resetSetup"> 完成 </v-btn>
                             </div>
                         </div>
                     </v-card-text>
@@ -332,7 +342,7 @@ onMounted(() => {
 
                 <div class="pt-2 pb-3" v-if="setupStep === 0">
                     <p class="text-subtitle-1 font-weight-medium">关于两步验证</p>
-                    <v-sheet class="pa-4 bg-grey-lighten-5">
+                    <v-sheet class="pa-1 rounded-lg mt-4">
                         <v-list>
                             <v-list-item prepend-icon="mdi-check-circle">
                                 两步验证会在您登录时额外要求输入验证器应用生成的验证码
@@ -341,7 +351,8 @@ onMounted(() => {
                                 即使密码泄露，未经授权的用户也无法访问您的账户
                             </v-list-item>
                             <v-list-item prepend-icon="mdi-check-circle">
-                                您需要下载验证器应用（如Google Authenticator、Microsoft Authenticator）
+                                您需要下载验证器应用（如Google Authenticator、Microsoft
+                                Authenticator）
                             </v-list-item>
                             <v-list-item prepend-icon="mdi-check-circle">
                                 启用两步验证后，我们会提供恢复码，请妥善保管
