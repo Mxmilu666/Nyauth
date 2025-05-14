@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "@mdi/font": "^7.4.47",
+    "@types/qrcode": "^1.5.5",
     "axios": "^1.8.3",
     "pinia": "^2.3.1",
+    "qrcode": "^1.5.4",
     "vue": "^3.5.13",
     "vue-router": "^4.5.0",
     "vue-turnstile": "^1.0.11",
