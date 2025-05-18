@@ -1,12 +1,17 @@
 <script setup lang="ts">
-import { defineOptions, ref, onMounted } from 'vue'
+import { defineOptions, ref, computed, watch } from 'vue'
 import { generateTOTP, firstVerifyTOTP } from '@/api/totp'
+import { getAccountStatus } from '@/api/login'
+import { useUserStore } from '@/stores/user'
 import { message } from '@/services/message'
 import QRCode from 'qrcode'
 
 defineOptions({
     name: 'TotpPage'
 })
+
+const userStore = useUserStore()
+const isUserReady = computed(() => !!userStore.userInfo.user_name)
 
 // 状态变量
 const loading = ref(false)
@@ -48,13 +53,16 @@ const handleError = (error: any) => {
 
 // 获取两步验证状态
 const checkTotpStatus = async () => {
-    // 实际情况下应当调用后端API
+    // 如果用户信息不可用，则不执行
+    if (!isUserReady.value) return
+
     loading.value = true
     try {
-        // 模拟API调用
-        // const { data } = await getTOTPStatus()
-        // totpEnabled.value = data?.data?.enabled || false
-        totpEnabled.value = false // 假设初始未启用
+        console.log('使用用户名:', userStore.userInfo.user_name)
+        const { data } = await getAccountStatus({
+            username: userStore.userInfo.user_name
+        })
+        totpEnabled.value = data?.data?.user_info?.enable_totp || false
     } catch (error) {
         handleError(error)
     } finally {
@@ -140,10 +148,16 @@ const copyToClipboard = (text: string) => {
         .then(() => message.success('已复制到剪贴板'))
         .catch(() => message.error('复制失败，请手动复制'))
 }
-// 页面加载时检查状态
-onMounted(() => {
-    checkTotpStatus()
-})
+
+watch(
+    () => isUserReady.value,
+    (ready) => {
+        if (ready) {
+            checkTotpStatus()
+        }
+    },
+    { immediate: true } // 组件创建时立即执行一次
+)
 </script>
 
 <template>

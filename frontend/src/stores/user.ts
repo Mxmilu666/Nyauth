@@ -2,7 +2,6 @@ import { reactive } from 'vue'
 import { defineStore } from 'pinia'
 
 export interface UserInfo {
-  email: string
   is_banned: boolean
   register_at: string
   role: string
@@ -15,7 +14,6 @@ export interface UserInfo {
 
 export const useUserStore = defineStore('user', () => {
   const userInfo = reactive<UserInfo>({
-    email: '',
     is_banned: false,
     register_at: '',
     role: '',
