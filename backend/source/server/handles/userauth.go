@@ -11,6 +11,7 @@ import (
 	"nyauth_backed/source/untils"
 
 	"github.com/gin-gonic/gin"
+	"github.com/pquerna/otp/totp"
 )
 
 // 用户登录
@@ -45,6 +46,46 @@ func UserLogin(c *gin.Context) {
 	if !userExists || user.UserPassword != creds.Password {
 		SendResponse(c, http.StatusNotFound, "用户不存在或密码不正确", nil)
 		return
+	}
+
+	// 检查用户是否启用了TOTP
+	totpEnabled, err := database.UserHasTOTP(user.UserID.Hex())
+	if err != nil {
+		SendResponse(c, http.StatusInternalServerError, "检查TOTP状态失败", nil)
+		return
+	}
+
+	// 如果用户启用了TOTP
+	if totpEnabled {
+		// 如果提供了TOTP代码，直接验证
+		if creds.TotpCode != "" {
+			// 获取用户TOTP密钥
+			_, secret, err := database.GetUserTOTPSecret(user.UserID.Hex())
+			if err != nil {
+				SendResponse(c, http.StatusInternalServerError, "获取TOTP密钥失败", nil)
+				return
+			}
+
+			// 验证TOTP代码
+			valid := totp.Validate(creds.TotpCode, secret)
+			if !valid {
+				// 检查是否使用恢复码
+				isRecoveryCode, err := database.ValidateAndConsumeRecoveryCode(user.UserID.Hex(), creds.TotpCode)
+				if err != nil || !isRecoveryCode {
+					SendResponse(c, http.StatusBadRequest, "TOTP验证码无效", nil)
+					return
+				}
+			}
+
+			// TOTP验证通过，继续生成token
+		} else {
+			// 未提供TOTP代码，返回需要TOTP验证的响应
+			SendResponse(c, http.StatusOK, "需要TOTP验证", gin.H{
+				"require_totp": true,
+				"username":     user.Username,
+			})
+			return
+		}
 	}
 
 	exp := int64(60 * 60 * 24)

@@ -4,6 +4,7 @@ import { ref, watch } from 'vue'
 
 import loginform from './Loginform.vue'
 import otpform from './Otpform.vue'
+import TotpVerifyForm from './TotpVerifyForm.vue'
 import passwordSetForm from './PasswordSetForm.vue'
 import { useLogin } from '@/hooks/useLogin'
 import turnstile from '@/components/turnstile/Turnstile.vue'
@@ -20,19 +21,24 @@ const otpVerifying = ref(false)
 const currentOtp = ref('')
 const sendingOtp = ref(false)
 const turnstilePurpose = ref<'login' | 'register' | 'sendOtp'>('login')
+const turnstileVerify = ref(false)
 
 const {
     istologin,
     istoregister,
     isOtpVerified,
     isLoading,
+    isTotpEnabled,
+    showTotp,
     email,
     password,
     otp,
+    totpCode,
     form,
     emailRules,
     rememberMe,
     login,
+    handleTotpInput,
     completeOtpVerification
 } = useLogin()
 
@@ -47,6 +53,7 @@ watch(istoregister, (isRegistering) => {
 // 验证码回调处理
 const handleCaptchaVerify = async (token: string) => {
     captchaToken.value = token
+    turnstileVerify.value = true
     showTurnstile.value = false
 
     switch (turnstilePurpose.value) {
@@ -55,7 +62,10 @@ const handleCaptchaVerify = async (token: string) => {
             break
         case 'login':
         case 'register':
-            login(token)
+            const loginResult = await login(token)
+            if (loginResult === false) {
+                showTotp.value = false
+            }
             break
     }
 }
@@ -106,8 +116,23 @@ const handleAuthentication = async () => {
         const { valid } = await form.value.validate()
         if (!valid) return
 
-        turnstilePurpose.value = 'login'
-        showTurnstile.value = true
+        if (isTotpEnabled.value && !showTotp.value) {
+            // 如果启用了 TOTP 且未显示 TOTP 输入框
+            showTotp.value = true
+            return
+        }
+
+        // 如果启用了 TOTP 且已经显示 TOTP 输入框
+        if (isTotpEnabled.value && showTotp.value) {
+            if (!totpCode.value || totpCode.value.length < 6) {
+                message.warning('请输入完整的两步验证码')
+                return
+            }
+            // 验证码已输入，继续验证
+            turnstilePurpose.value = 'login'
+            showTurnstile.value = true
+            return
+        }
         return
     }
 
@@ -159,6 +184,14 @@ const handleOtpInput = (otpCode: string) => {
         handleAuthentication()
     }
 }
+
+// 处理TOTP输入
+const handleTotpVerify = (code: string) => {
+    handleTotpInput(code)
+    if (code.length === 6) {
+        handleAuthentication()
+    }
+}
 </script>
 
 <template>
@@ -205,7 +238,7 @@ const handleOtpInput = (otpCode: string) => {
                     <v-card-text>
                         <v-form ref="form" class="px-4" @submit.prevent>
                             <v-text-field
-                                v-if="!istoregister"
+                                v-if="!(istoregister && turnstileVerify) && !showTotp"
                                 v-model="email"
                                 label="电子邮箱"
                                 color="primary"
@@ -217,12 +250,22 @@ const handleOtpInput = (otpCode: string) => {
                             />
                             <v-slide-y-transition :leave-absolute="true">
                                 <loginform
-                                    v-if="istologin"
+                                    v-if="istologin && !isTotpEnabled"
                                     v-model="password"
                                     @enter="handleAuthentication"
                                 />
+                                <loginform
+                                    v-if="istologin && isTotpEnabled && !showTotp"
+                                    v-model="password"
+                                    @enter="handleAuthentication"
+                                />
+                                <TotpVerifyForm
+                                    v-if="istologin && isTotpEnabled && showTotp"
+                                    :loading="isLoading"
+                                    @totpEnter="handleTotpVerify"
+                                />
                                 <otpform
-                                    v-if="istoregister && !isOtpVerified"
+                                    v-if="istoregister && !isOtpVerified && turnstileVerify"
                                     :email="email"
                                     :otp="otp"
                                     :loading="otpVerifying || sendingOtp"

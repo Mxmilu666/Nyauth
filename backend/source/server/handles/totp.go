@@ -119,7 +119,7 @@ func VerifyAndEnableTOTP(c *gin.Context) {
 	// 清除临时密钥
 	helper.RemoveTempTOTPSecret(tempKey)
 
-	// 生成恢复码（使用database包中的函数）
+	// 生成恢复码
 	recoveryCodes, err := database.GenerateAndSaveRecoveryCodes(userID, 5)
 	if err != nil {
 		SendResponse(c, http.StatusInternalServerError, "生成恢复码失败", nil)

@@ -3,6 +3,7 @@ package models
 type LoginCredentials struct {
 	Username  string `json:"username"`
 	Password  string `json:"password"`
+	TotpCode  string `json:"totp_code,omitempty"`
 	Secretkey string `json:"turnstile_secretkey"`
 }
 

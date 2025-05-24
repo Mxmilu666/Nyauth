@@ -80,10 +80,10 @@ func rsaPublicKeyToJWK(pubKey *rsa.PublicKey) JWK {
 	}
 
 	return JWK{
-		Kid: "default-key", // 密钥ID，在生产环境中应该使用唯一的ID
-		Kty: "RSA",         // 密钥类型
-		Use: "sig",         // 用途：签名
-		Alg: "RS256",       // 算法
+		Kid: "Nyauth-Server", // 密钥ID
+		Kty: "RSA",           // 密钥类型
+		Use: "sig",           // 用途：签名
+		Alg: "RS256",         // 算法
 		N:   untils.Base64URLEncode(nBytes),
 		E:   untils.Base64URLEncode(e),
 	}
