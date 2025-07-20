@@ -157,6 +157,8 @@ func SendVerificationCodeByEmail(to, usefor string) error {
 		useType = "重置密码"
 	case "multi_identity":
 		useType = "绑定多身份"
+	case "disable_totp":
+		useType = "关闭 TOTP"
 	default:
 		return fmt.Errorf("invalid usefor: %s", usefor)
 	}

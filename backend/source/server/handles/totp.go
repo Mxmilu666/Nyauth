@@ -201,6 +201,17 @@ func DisableTOTP(c *gin.Context) {
 	}
 	userID := claims.(jwt.MapClaims)["data"].(map[string]interface{})["user_id"].(string)
 
+	// 获取用户信息
+	user, err := database.GetUserByID(userID)
+	if err != nil {
+		SendResponse(c, http.StatusInternalServerError, "获取用户信息失败", nil)
+		return
+	}
+	if user == nil {
+		SendResponse(c, http.StatusNotFound, "用户不存在", nil)
+		return
+	}
+
 	// 验证密码
 	var req models.TOTPDisableRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -208,8 +219,14 @@ func DisableTOTP(c *gin.Context) {
 		return
 	}
 
+	// 验证验证码
+	if !helper.VerifyCode(user.UserEmail, req.Code, "multi_identity") {
+		SendResponse(c, http.StatusBadRequest, "验证码错误或已过期", nil)
+		return
+	}
+
 	// 禁用TOTP
-	err := database.DisableTOTP(userID)
+	err = database.DisableTOTP(userID)
 	if err != nil {
 		SendResponse(c, http.StatusInternalServerError, "禁用TOTP失败", nil)
 		return

@@ -189,7 +189,7 @@ func SendVerificationCode(c *gin.Context) {
 
 	// 根据 usefor 执行对应的操作
 	switch usefor {
-	case "register", "reset_password", "multi_identity":
+	case "register", "reset_password", "multi_identity", "disable_totp":
 		err := helper.SendVerificationCodeByEmail(creds.Useremail, usefor)
 		if err != nil {
 			if errors.Is(err, helper.ErrVerificationCodeExists) {
