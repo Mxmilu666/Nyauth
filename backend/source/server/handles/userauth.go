@@ -227,9 +227,9 @@ func GetAccountStatus(c *gin.Context) {
 		// 用户存在
 		SendResponse(c, http.StatusOK, "success", gin.H{
 			"exists": true,
-			"user_info": map[string]string{
+			"user_info": map[string]interface{}{
 				"email":       user.UserEmail,
-				"enable_totp": fmt.Sprintf("%t", user.TOTPEnabled),
+				"enable_totp": user.TOTPEnabled,
 			},
 		})
 	} else {
