@@ -40,9 +40,10 @@ func EnableTOTP(userID, secret string) error {
 	collection := client.Database(DatabaseName).Collection(UserCollection)
 	update := bson.M{
 		"$set": bson.M{
-			"totp_enabled": true,
-			"totp_secret":  secret,
-			"updated_at":   bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
+			"totp_enabled":    true,
+			"totp_secret":     secret,
+			"totp_enabled_at": bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
+			"updated_at":      bson.DateTime(time.Now().UnixNano() / int64(time.Millisecond)),
 		},
 	}
 

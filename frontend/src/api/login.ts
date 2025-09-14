@@ -4,7 +4,6 @@ export const getAccountStatus = (data: { username: string }) => {
         Response<{
             exists: boolean
             user_info?: {
-                email: string
                 enable_totp: boolean
             }
         }>

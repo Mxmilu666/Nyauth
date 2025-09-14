@@ -13,6 +13,8 @@ export const getAccountInfo = () => {
                 user_id: string
                 user_uuid: string
                 user_name: string
+                otp_enabled: boolean
+                otp_enable_at: string | null
             }
         }>
     >('/account/info')

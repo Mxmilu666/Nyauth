@@ -33,14 +33,16 @@ func UserInfo(c *gin.Context) {
 
 	// 输出格式
 	userInfo := map[string]interface{}{
-		"user_id":     user.UserID.Hex(),
-		"user_uuid":   user.UserUUID,
-		"user_name":   user.Username,
-		"user_email":  user.UserEmail,
-		"user_avatar": user.Avatar,
-		"role":        user.Role,
-		"is_banned":   user.IsBanned,
-		"register_at": user.RegisterAt,
+		"user_id":       user.UserID.Hex(),
+		"user_uuid":     user.UserUUID,
+		"user_name":     user.Username,
+		"user_email":    user.UserEmail,
+		"user_avatar":   user.Avatar,
+		"role":          user.Role,
+		"is_banned":     user.IsBanned,
+		"register_at":   user.RegisterAt.Time().Format("2006-01-02 15:04:05"),
+		"otp_enabled":   user.TOTPEnabled,
+		"otp_enable_at": user.TOTPEnabledAt.Time().Format("2006-01-02 15:04:05"),
 	}
 
 	// 将用户信息封装在 user_info 对象中

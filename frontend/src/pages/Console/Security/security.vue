@@ -1,10 +1,18 @@
 <script setup lang="ts">
+import { defineOptions, computed } from 'vue'
 import SecurityInfoCard from './SecurityInfoCard.vue'
+import { useUserStore } from '@/stores/user'
 
 defineOptions({
     name: 'securityPage'
 })
+
+const userStore = useUserStore()
+
+const otpEnabled = computed(() => userStore.userInfo.otp_enabled)
+const otpEnableAt = computed(() => userStore.userInfo.otp_enable_at)
 </script>
+
 
 <template>
     <v-container class="center">
@@ -19,7 +27,7 @@ defineOptions({
             </div>
             <v-row>
                 <v-col cols="12">
-                    <SecurityInfoCard :totpTitle="'启用时间：2022-22-22'" />
+                    <SecurityInfoCard :totpTitle="otpEnabled ? '启用时间：' + otpEnableAt : '未启用'" />
                 </v-col>
             </v-row>
         </div>

@@ -4,18 +4,20 @@ import "go.mongodb.org/mongo-driver/v2/bson"
 
 // user 集合中的文档结构
 type DatabaseUser struct {
-	UserID       bson.ObjectID `bson:"_id"`
-	UserUUID     string        `bson:"user_uuid"`
-	UserPassword string        `bson:"user_pass"`
-	Username     string        `bson:"user_name"`
-	UserEmail    string        `bson:"user_email"`
-	Avatar       string        `bson:"avatar"`
-	RegisterAt   bson.DateTime `bson:"register_at"`
-	UpdatedAt    bson.DateTime `bson:"updated_at"`
-	IsBanned     bool          `bson:"is_banned"`
-	Role         string        `bson:"role"`
-	TOTPEnabled  bool          `bson:"totp_enabled"` // 是否启用二次验证
-	TOTPSecret   string        `bson:"totp_secret"`
+	UserID        bson.ObjectID `bson:"_id"`
+	UserUUID      string        `bson:"user_uuid"`
+	UserPassword  string        `bson:"user_pass"`
+	Username      string        `bson:"user_name"`
+	UserEmail     string        `bson:"user_email"`
+	Avatar        string        `bson:"avatar"`
+	RegisterAt    bson.DateTime `bson:"register_at"`
+	UpdatedAt     bson.DateTime `bson:"updated_at"`
+	IsBanned      bool          `bson:"is_banned"`
+	Role          string        `bson:"role"`
+	TOTPEnabled   bool          `bson:"totp_enabled"` // 是否启用二次验证
+	TOTPSecret    string        `bson:"totp_secret"`
+	TOTPEnabledAt bson.DateTime `bson:"totp_enabled_at"`
+	RecoveryCodes []string      `bson:"recovery_codes"`
 }
 
 // client 集合中的文档结构

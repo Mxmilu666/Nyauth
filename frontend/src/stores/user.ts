@@ -10,6 +10,8 @@ export interface UserInfo {
   user_id: string
   user_uuid: string
   user_name: string
+  otp_enabled: boolean
+  otp_enable_at: string | null
 }
 
 export const useUserStore = defineStore('user', () => {
@@ -21,7 +23,9 @@ export const useUserStore = defineStore('user', () => {
     user_email: '',
     user_id: '',
     user_uuid: '',
-    user_name: ''
+    user_name: '',
+    otp_enabled: false,
+    otp_enable_at: null
   })
   
   const updateUserInfo = (info: Partial<UserInfo>) => {
