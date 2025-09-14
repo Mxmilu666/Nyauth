@@ -7,6 +7,7 @@ export interface MultiAccount {
     lastActiveTime: string
     tagText: string
     userId?: string
+    email?: string
 }
 
 export function useMultiAccounts() {
@@ -35,7 +36,8 @@ export function useMultiAccounts() {
                         userName: identity.display_name,
                         lastActiveTime,
                         tagText,
-                        userId: identity.uuid
+                        userId: identity.uuid,
+                        email: identity.email
                     }
                 })
             } else {

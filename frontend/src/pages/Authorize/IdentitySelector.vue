@@ -45,7 +45,7 @@ const onIdentityChange = (id: number) => {
                         />
                     </v-avatar>
                     <div class="d-flex flex-wrap align-center">
-                        <span class="font-weight-medium me-1">
+                        <span class="font-weight-medium me-1 text-truncate" style="max-width: 200px">
                             {{ selectedIdentity.userName }}
                         </span>
                         <v-chip
@@ -54,7 +54,7 @@ const onIdentityChange = (id: number) => {
                             class="me-1 flex-shrink-0 my-1"
                         >
                             <v-icon icon="mdi-label" />
-                            {{ selectedIdentity.tagText }}
+                            <span class="text-truncate" style="max-width: 120px">{{ selectedIdentity.tagText }}</span>
                         </v-chip>
                         <span class="text-caption text-grey text-truncate">
                             {{ selectedIdentity.email }}

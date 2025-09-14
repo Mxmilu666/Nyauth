@@ -1,8 +1,9 @@
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import { getClientInfo, getOAuthAuthorize, type OAuthAuthorizeParams } from '@/api/oauth'
 import { useRoute } from 'vue-router'
 import { modal } from '@/services/modal'
 import router from '@/router'
+import { useMultiAccounts } from '@/hooks/useMultiAccounts'
 
 export interface Identity {
     id: number
@@ -14,40 +15,58 @@ export interface Identity {
 
 export function useIdentities() {
     // 用户身份列表
-    const identities = ref<Identity[]>([
-        {
-            id: 1,
-            userName: '米露',
-            email: 'milu@milu.moe',
-            avatar: 'https://placehold.co/100/6200ea/fff?text=M',
-            tagText: '主账号'
-        },
-        {
-            id: 2,
-            userName: '西米',
-            email: 'work@company.com',
-            avatar: 'https://placehold.co/100/2962ff/fff?text=X',
-            tagText: 'BList'
-        },
-        {
-            id: 3,
-            userName: 'Baka',
-            email: 'admin@example.com',
-            avatar: 'https://placehold.co/100/dd2c00/fff?text=B',
-            tagText: 'Blog'
-        }
-    ])
+    const { accounts, loading, error } = useMultiAccounts()
+
+    // 等待账户数据加载完成后处理
+    const identities = computed(() => {
+        if (!accounts.value) return []
+        
+        console.log('Accounts:', accounts.value)
+        return accounts.value.map((account, index) => ({
+            id: index + 1,
+            userName: account.userName || 'Unknown',
+            email: account.userId ? `${account.email}` : 'unknown@example.com',
+            avatar: account.avatar || 'https://gravatar.com/avatar/ccd1317597a7796d8b5f2b2785e88d5f?d=identicon&s=256',
+            tagText: index === 0 ? '主账号' : account.tagText || `账号 ${index + 1}`
+        }))
+    })
 
     // 当前选择的身份ID
     const selectedIdentityId = ref(1)
 
     // 获取当前选择的身份对象
     const selectedIdentity = computed(() => {
-        return (
-            identities.value.find(
-                (identity) => identity.id === selectedIdentityId.value
-            ) || identities.value[0]
+        if (loading.value) {
+            // 加载中时返回一个默认身份对象
+            return {
+                id: selectedIdentityId.value,
+                userName: 'Loading...',
+                email: 'loading@example.com',
+                avatar: 'https://gravatar.com/avatar/ccd1317597a7796d8b5f2b2785e88d5f?d=identicon&s=256',
+                tagText: '加载中...'
+            }
+        }
+
+        const found = identities.value.find(
+            (identity) => identity.id === selectedIdentityId.value
         )
+
+        if (found) return found
+
+        // 如果没有找到匹配的身份，但有其他身份可用
+        if (identities.value.length > 0) {
+            selectedIdentityId.value = identities.value[0].id
+            return identities.value[0]
+        }
+
+        // 如果没有任何身份，返回默认身份
+        return {
+            id: selectedIdentityId.value,
+            userName: 'Unknown',
+            email: 'unknown@example.com',
+            avatar: 'https://gravatar.com/avatar/ccd1317597a7796d8b5f2b2785e88d5f?d=identicon&s=256',
+            tagText: '未知账号'
+        }
     })
 
     return {
