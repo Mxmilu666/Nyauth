@@ -7,6 +7,7 @@ import { useMultiAccounts } from '@/hooks/useMultiAccounts'
 
 export interface Identity {
     id: number
+    userId: string
     userName: string
     email: string
     avatar: string
@@ -20,10 +21,10 @@ export function useIdentities() {
     // 等待账户数据加载完成后处理
     const identities = computed(() => {
         if (!accounts.value) return []
-        
-        console.log('Accounts:', accounts.value)
+    
         return accounts.value.map((account, index) => ({
             id: index + 1,
+            userId: account.userId || '',
             userName: account.userName || 'Unknown',
             email: account.userId ? `${account.email}` : 'unknown@example.com',
             avatar: account.avatar || 'https://gravatar.com/avatar/ccd1317597a7796d8b5f2b2785e88d5f?d=identicon&s=256',
@@ -40,6 +41,7 @@ export function useIdentities() {
             // 加载中时返回一个默认身份对象
             return {
                 id: selectedIdentityId.value,
+                userId: '',
                 userName: 'Loading...',
                 email: 'loading@example.com',
                 avatar: 'https://gravatar.com/avatar/ccd1317597a7796d8b5f2b2785e88d5f?d=identicon&s=256',
@@ -62,6 +64,7 @@ export function useIdentities() {
         // 如果没有任何身份，返回默认身份
         return {
             id: selectedIdentityId.value,
+            userId: '',
             userName: 'Unknown',
             email: 'unknown@example.com',
             avatar: 'https://gravatar.com/avatar/ccd1317597a7796d8b5f2b2785e88d5f?d=identicon&s=256',
@@ -222,8 +225,19 @@ export function useOAuthAuthorize() {
             // 设置处理中状态
             authProcessing.value = true
 
-            // 发送授权请求
-            const { data: response } = await getOAuthAuthorize(oauthParams.value)
+            // 获取选中的身份信息
+            const identityInfo = identities.value.find(identity => identity.id === selectedIdentityId.value)
+            if (!identityInfo) {
+                throw new Error('未选择有效的身份')
+            }
+
+            console.log(identityInfo)
+            // 发送授权请求，包含身份ID
+            const authorizeParams = {
+                ...oauthParams.value,
+                user_id: identityInfo.userId
+            }
+            const { data: response } = await getOAuthAuthorize(authorizeParams)
             
             // 添加1秒延迟模拟处理过程
             await new Promise(resolve => setTimeout(resolve, 1000))

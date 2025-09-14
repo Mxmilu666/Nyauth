@@ -6,6 +6,7 @@ export interface OAuthAuthorizeParams {
     response_type: string
     scope: string
     state: string
+    user_id?: string
 }
 
 export interface OAuthAuthorizeResponse {
